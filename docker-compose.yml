@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  integration_sm_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    container_name: integration_sm_api
+    ports:
+      - "9000:9000"
+    networks:
+      - integration_sm_api
+    restart: always
+
+
+
+networks:
+  integration_sm_api:
+    driver: bridge
+
