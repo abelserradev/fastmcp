@@ -8,6 +8,12 @@ from app.utils.LoggerSingleton import logger
 class Settings(BaseSettings):
     # Define the attributes of the Settings class
     API_KEY_AUTH: str
+    SM_PRIMARY_KEY: str
+    SM_SECONDARY_KEY: str
+    SM_ENDPOINT: str
+    USER: str
+    APPLICATION: str
+    SUBSCRIPTION_KEY: str
 
     # Load the settings from the .env file
     model_config = SettingsConfigDict(env_file=".env")
@@ -22,11 +28,17 @@ def get_settings() -> Settings:
     """
     return Settings()
 
+
 # Get the settings
 settings = get_settings()
 
 # Assign the settings to variables
 API_KEY_AUTH = settings.API_KEY_AUTH
-
+SM_PRIMARY_KEY = settings.SM_PRIMARY_KEY
+SM_SECONDARY_KEY = settings.SM_SECONDARY_KEY
+SM_ENDPOINT = settings.SM_ENDPOINT
+USER = settings.USER
+APPLICATION = settings.APPLICATION
+SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
 # Log that the settings have been loaded
 logger.info("Settings loaded")

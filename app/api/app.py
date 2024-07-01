@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-
+from app.utils.LoggerSingleton import logger
+from app.api.Integration_SM.app import router as api_router
 app = FastAPI(
     title="Asistensi Integración Seguros Mercantil",  # The title of the API
     description="Asistensi Integración Seguros Mercantil",  # The description of the API
@@ -13,7 +15,21 @@ app = FastAPI(
     allow_headers="*",
 )
 
+# Add a middleware for handling CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+app.include_router(api_router, prefix="/api/v1/sm")
+
+logger.info("API started")
