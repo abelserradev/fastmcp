@@ -1,9 +1,9 @@
 import json
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Security, HTTPException
 import requests
 
-from app.api.Integration_SM.ModelAPI import ConsultPersonBase, CrearPersonaBase
+from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.LoggerSingleton import logger
 from app.utils.configs import (
@@ -14,7 +14,7 @@ from app.utils.configs import (
     USER,
     APPLICATION, SUBSCRIPTION_KEY
 )
-from app.utils.constants import payload_persona
+from app.utils.constants import payload_persona, tipo_documento
 
 router = APIRouter(
     tags=["SM"],
@@ -33,13 +33,13 @@ headers = {
 
 
 @router.post("/consultar_persona", summary="Consultar persona en Seguros Mercantil")
-def consultar_persona(request: ConsultPersonBase) -> dict:
+def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
+    num_document = request.dict(exclude_unset=True)["num_documento"]
 
-    tp_document = request.tipo_documento.value
-    num_document = request.num_documento
+    tp_document = tipo_documento[num_document[0]]
+    num_document = num_document[2:] if num_document[0] == "P" else num_document
 
-
-    body = json.dumps({
+    body = {
         "aplicacion": APPLICATION,
         "funcionalidad": "CONSULTAR_PERSONA_V",
         "usuario": USER,
@@ -47,12 +47,13 @@ def consultar_persona(request: ConsultPersonBase) -> dict:
             "tp_documento": tp_document,
             "nu_documento": num_document
         }
-    })
+    }
 
     logger.info(f"body: {body}")
     logger.info(f"headers: {headers}")
     logger.info(f"url_consult_persona: {url_consult_persona}")
-    response = requests.post(url_consult_persona, data=body, headers=headers)
+
+    response = requests.post(url_consult_persona, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
@@ -65,12 +66,13 @@ def consultar_persona(request: ConsultPersonBase) -> dict:
 
 
 @router.post("/crear_persona", summary="Crear persona en Seguros Mercantil")
-def crear_persona(request: CrearPersonaBase) -> dict:
+def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     data = request.dict(exclude_unset=True)
     logger.info(f"data: {data}")
     body = payload_persona.copy()
-    nu_documento = data["persona"]["documento"]["nu_documento"]
-    tp_documento = data["persona"]["documento"]["tp_documento"].value
+    nu_documento = data["persona"]["documento"]["nu_documento"][2:] if data["persona"]["documento"]["nu_documento"][0] == "P" else data["persona"]["documento"]["nu_documento"]
+    tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
+
     fe_nacimiento = data["persona"]["fe_nacimiento"].strftime("%d/%m/%Y")
     fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
     body["persona"][0]["nm_primer_nombre"] = data["persona"]["nm_primer_nombre"]

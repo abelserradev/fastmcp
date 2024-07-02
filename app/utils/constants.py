@@ -49,3 +49,9 @@ payload_persona = {
   ],
   "usuario": USER
 }
+
+tipo_documento = {
+  "V": "VEN",
+  "E": "VEN",
+  "P": "PVEN"
+}
