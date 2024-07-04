@@ -137,3 +137,10 @@ class EmitirPolizaBase(BaseModel):
     cd_entidad: int
     nu_cotizacion: int
 
+
+class ConsultarPolizaBase(BaseModel):
+    cd_entidad: int
+    cd_area: int
+    poliza: int
+    certificado: int
+    nu_recibo: int

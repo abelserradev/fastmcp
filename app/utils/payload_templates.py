@@ -157,3 +157,26 @@ payload_emitir_poliza = {
         }]
     }
 }
+
+payload_consultar_poliza = {
+    "aplicacion": APPLICATION,
+    "funcionalidad": "CONSULTAR_POL_REC_CUOTA_V",
+    "usuario": USER,
+    "polizas-recibos": [{
+        "cd_entidad": 1,
+        "cd_area": 71,
+        "poliza": 145821,
+        "certificado": 1,
+        "nu_recibo": 1028810
+    }]
+}
+
+payload_consultar_persona = {
+        "aplicacion": APPLICATION,
+        "funcionalidad": "CONSULTAR_PERSONA_V",
+        "usuario": USER,
+        "persona": {
+            "tp_documento": "VEN",
+            "nu_documento": "V-55555555"
+        }
+    }
