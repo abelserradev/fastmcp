@@ -131,3 +131,9 @@ class PersonaPolizaBase(BaseModel):
 class CrearPolizaBase(BaseModel):
     persona: PersonaPolizaBase
     poliza: PolizaBase
+
+
+class EmitirPolizaBase(BaseModel):
+    cd_entidad: int
+    nu_cotizacion: int
+

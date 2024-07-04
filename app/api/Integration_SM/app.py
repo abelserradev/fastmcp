@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Security, HTTPException
 import requests
 
-from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase
+from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase, EmitirPolizaBase
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.LoggerSingleton import logger
 from app.utils.configs import (
@@ -15,11 +15,13 @@ from app.utils.configs import (
     APPLICATION, SUBSCRIPTION_KEY
 )
 from app.utils.constants import (
-    payload_persona,
     tipo_documento,
+    frecuencia_cuota
+)
+from app.utils.payload_templates import (
+    payload_persona,
     payload_cotizacion,
-    frecuencia_cuota,
-    fields_setup
+    payload_emitir_poliza
 )
 
 router = APIRouter(
@@ -30,6 +32,9 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 url_consult_persona = f"{SM_ENDPOINT}/consultarpersona"
 url_crear_persona = f"{SM_ENDPOINT}/crearpersona"
+url_crear_poliza = f"{SM_ENDPOINT}/cotizaraccpersonales"
+url_emitir_poliza = f"{SM_ENDPOINT}/emitirpoliza"
+
 
 headers = {
     "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
@@ -147,7 +152,30 @@ def crear_poliza(request: CrearPolizaBase, api_key: str = Security(api_key_verif
     body["coll_datos"] = coll_datos
     logger.info(f"data: {body}")
 
-    response = requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
+    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
+    logger.info(f"Response status code: {response.status_code}")
+    # convertir response to JSON
+    response_json = json.loads(response.content)
+
+    # verificar si el request fue exitoso
+    if response.status_code == 200:
+        return {"status": "success", "data": response_json}
+
+    return {"status": "error", "data": response_json}
+
+
+@router.post("/emitir_poliza", summary="Emitir poliza de persona en Seguros Mercantil")
+def emitir_poliza(request: EmitirPolizaBase) -> dict:
+    data = request.dict(exclude_unset=True)
+    logger.info(f"data: {data}")
+    logger.info(f"headers: {headers}")
+    logger.info(f"url_emitir_poliza: {url_emitir_poliza}")
+    body = payload_emitir_poliza.copy()
+    body["coll_generales"]["generales"][0]["cd_entidad"] = data["cd_entidad"]
+    body["coll_generales"]["generales"][0]["nu_cotizacion"] = data["nu_cotizacion"]
+    logger.info(f"Body: {body}")
+
+    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
