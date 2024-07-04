@@ -74,4 +74,60 @@ class CrearPersonaBase(BaseModel):
         raise ValueError('fe_registro debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy')
 
 
+class FrecuenciaCuota(Enum):
+    MENSUAL = 'MENSUAL'
+    TRIMESTRAL = 'TRIMESTRAL'
+    SEMESTRAL = 'SEMESTRAL'
+    ANUAL = 'ANUAL'
 
+
+class PolizaBase(BaseModel):
+    fe_desde: Union[datetime, str]  # Aceptar tanto datetime como str
+    fe_hasta: Union[datetime, str]  # Aceptar tanto datetime como str
+    frecuencia_cuota: FrecuenciaCuota
+    suma_asegurada: float
+
+    @validator('fe_desde', pre=True)
+    def validate_fe_desde(cls, v):
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%d/%m/%Y').date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError('fe_nacimiento debe estar en el formato dd/mm/yyyy')
+        raise ValueError('fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy')
+
+    @validator('fe_hasta', pre=True)
+    def validate_fe_hasta(cls, v):
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%d/%m/%Y').date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError('fe_nacimiento debe estar en el formato dd/mm/yyyy')
+        raise ValueError('fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy')
+
+
+class PersonaPolizaBase(BaseModel):
+    nm_primer_nombre: str
+    nm_primer_apellido: str
+    documento: DocumentoBase
+    fecha_nacimiento: Union[datetime, str]  # Aceptar tanto datetime como str para
+
+    @validator('fecha_nacimiento', pre=True)
+    def validate_fecha_nacimiento(cls, v):
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%d/%m/%Y').date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError('fe_nacimiento debe estar en el formato dd/mm/yyyy')
+        raise ValueError('fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy')
+
+
+class CrearPolizaBase(BaseModel):
+    persona: PersonaPolizaBase
+    poliza: PolizaBase

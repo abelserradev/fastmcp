@@ -55,3 +55,103 @@ tipo_documento = {
   "E": "VEN",
   "P": "PVEN"
 }
+
+payload_cotizacion = {
+    "persona": [],
+    "funcionalidad": "COTIZAR_ACCD_PERS_V",
+    "aplicacion": APPLICATION,
+    "usuario": USER,
+    "coll_datos": {
+        "datos": [
+            {
+                "cd_dato": 990150, # Suma asegurada
+                "nu_bien": 1,
+                "valor": 5000 # variable
+            },
+            {
+                "cd_dato": 990140, # país residencia ven 29.
+                "nu_bien": 1,
+                "valor": "29"
+            },
+            {
+                "cd_dato": 990141, # País de la tarifa ven 29
+                "nu_bien": 1,
+                "valor": "29"
+            },
+            {
+                "cd_dato": 990160, # Fecha de nacimiento
+                "nu_bien": 1,
+                "valor": "01-01-1980" # Variable
+            },
+            {
+                "cd_dato": 990205, # Goza de buena salud, fijo
+                "nu_bien": 1,
+                "valor": "S"
+            },
+            {
+                "cd_dato": 100130, # Asistencia en viaje
+                "nu_bien": 1,
+                "valor": "0"
+            },
+            {
+                "cd_dato": 100135, # Gastos médicos
+                "nu_bien": 1,
+                "valor": "1"
+            }
+        ]
+    },
+    "coll_bienes": {
+        "bienes": [
+            {
+                "in_seleccion": 1,
+                "in_grupo_asegurado": 1,
+                "nu_bien": 1, # Variable fija.
+                "in_asegurado": 1,
+                "de_bien": "Jesus Prueba" # Variable
+            }
+        ]
+    },
+    "coll_generales": {
+        "generales": [
+            {
+                "cd_clase_riesgo": "N",
+                "fe_desde": "01/04/2022", # Variable
+                "fe_hasta": "01/04/2023", # Variable
+                "cd_producto": 100100,
+                "cd_persona_med": 11626,
+                "di_ip": "0.0.0.0",
+                "in_solo_preparar": 0,
+                "cd_usuario": "S3916",
+                "cd_moneda": 2,
+                "cd_entidad": "1",
+                "cd_plan_pago": 204, # códigos mensual: 201, trimestral: 202, semestral: 203, anual:204
+                "cd_frecuencia_cuota": "", # Dejar en blanco
+                "ca_cuota": "", # Dejar en blanco
+                "cd_canal_venta": 46,
+                "cd_sucursal": "1",
+                "nu_documento_contratante": "V-15500500", # Variable
+                "tp_documento_contratante": "VEN", # Variable
+                "nu_documento": "V-15500500", # Variable
+                "tp_documento": "VEN", # Variable
+                "in_todos": 0,
+                "in_grabar": 1,
+                "cd_region": 1,
+                "nm_cliente": "Jesus Prueba", # Variable
+                "cd_vigencia": "A",
+                "cd_area": "1"
+            }
+        ]
+    },
+    "coll_grpaseg": {
+        "grpaseg": []
+    }
+}
+
+frecuencia_cuota = {
+    "MENSUAL": 201,
+    "TRIMESTRAL": 202,
+    "SEMESTRAL": 203,
+    "ANUAL": 204
+}
+
+fields_setup = [990150,990160]

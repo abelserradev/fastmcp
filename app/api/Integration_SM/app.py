@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, Security, HTTPException
 import requests
 
-from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase
+from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.LoggerSingleton import logger
 from app.utils.configs import (
@@ -14,7 +14,13 @@ from app.utils.configs import (
     USER,
     APPLICATION, SUBSCRIPTION_KEY
 )
-from app.utils.constants import payload_persona, tipo_documento
+from app.utils.constants import (
+    payload_persona,
+    tipo_documento,
+    payload_cotizacion,
+    frecuencia_cuota,
+    fields_setup
+)
 
 router = APIRouter(
     tags=["SM"],
@@ -92,6 +98,54 @@ def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_ver
     logger.info(f"body: {json.dumps(body)}")
     logger.info(f"headers: {headers}")
     logger.info(f"url_crear_persona: {url_crear_persona}")
+
+    response = requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
+    logger.info(f"Response status code: {response.status_code}")
+    # convertir response to JSON
+    response_json = json.loads(response.content)
+
+    # verificar si el request fue exitoso
+    if response.status_code == 200:
+        return {"status": "success", "data": response_json}
+
+    return {"status": "error", "data": response_json}
+
+
+@router.post("/crear_poliza", summary="Crear poliza de persona en Seguros Mercantil")
+def crear_poliza(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+
+    data = request.dict(exclude_unset=True)
+    fecha_nacimiento = data["persona"]["fecha_nacimiento"].strftime("%d-%m-%Y")
+    suma_poliza = data["poliza"]["suma_asegurada"]
+    fe_desde = data["poliza"]["fe_desde"].strftime("%d/%m/%Y")
+    fe_hasta = data["poliza"]["fe_hasta"].strftime("%d/%m/%Y")
+    cd_plan_pago = frecuencia_cuota[data["poliza"]["frecuencia_cuota"].value]
+    nu_documento = data["persona"]["documento"]["nu_documento"][2:] if data["persona"]["documento"]["nu_documento"][0] == "P" else data["persona"]["documento"]["nu_documento"]
+    tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
+    fullname = f"{data['persona']['nm_primer_nombre']} {data['persona']['nm_primer_apellido']}"
+
+    body = payload_cotizacion.copy()
+    body["coll_bienes"]["bienes"][0]["de_bien"] = fullname
+
+    body["coll_generales"]["generales"][0]["fe_desde"] = fe_desde
+    body["coll_generales"]["generales"][0]["fe_hasta"] = fe_hasta
+    body["coll_generales"]["generales"][0]["cd_plan_pago"] = cd_plan_pago
+    body["coll_generales"]["generales"][0]["nm_cliente"] = fullname
+    body["coll_generales"]["generales"][0]["nu_documento"] = nu_documento
+    body["coll_generales"]["generales"][0]["tp_documento"] = tp_documento
+    body["coll_generales"]["generales"][0]["nu_documento_contratante"] = nu_documento
+    body["coll_generales"]["generales"][0]["tp_documento_contratante"] = tp_documento
+
+    coll_datos = {"datos":[]}
+    for item in body["coll_datos"]["datos"]:
+        if item["cd_dato"] == 990150:
+            item["valor"] = suma_poliza
+        if item["cd_dato"] == 990160:
+            item["valor"] = fecha_nacimiento
+        coll_datos["datos"].append(item)
+
+    body["coll_datos"] = coll_datos
+    logger.info(f"data: {body}")
 
     response = requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
