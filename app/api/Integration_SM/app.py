@@ -1,10 +1,18 @@
 import json
+from typing import List
 
-from fastapi import APIRouter, Security, HTTPException
+from fastapi import (
+    APIRouter,
+    Security,
+    HTTPException,
+    status
+)
 import requests
 
 from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase, EmitirPolizaBase, \
     ConsultarPolizaBase
+from app.api.Integration_SM.ResponseModelAPI import PersonaResponseBase, CreadaPersonaResponse, CotizacionResponse, \
+    CotizacionResponse, EmisionResponse, PolizasConsultaResponse
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.LoggerSingleton import logger
 from app.utils.configs import (
@@ -30,24 +38,25 @@ router = APIRouter(
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 
-@router.post("/consultar_persona", summary="Consultar persona en Seguros Mercantil")
+
+@router.post("/consultar_persona", response_model=PersonaResponseBase, status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
 def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
-    Consulta la información de una persona en Seguros Mercantil utilizando su número de documento.
+        Consulta la información de una persona en Seguros Mercantil utilizando su número de documento.
 
-    Este endpoint recibe un objeto `ConsultarPersonaBase` que contiene el número de documento de la persona a consultar.
-    El tipo de documento se determina por el primer carácter del número de documento. Si el primer carácter es 'P',
-    se elimina para la consulta. La función construye el cuerpo de la solicitud para la API de consulta de persona,
-    registra la solicitud en el log, realiza la solicitud a la API, registra la respuesta, y verifica el código de estado
-    de la respuesta para retornar los datos correspondientes.
+        Este endpoint recibe un objeto `ConsultarPersonaBase` que contiene el número de documento de la persona a consultar.
+        El tipo de documento se determina por el primer carácter del número de documento. Si el primer carácter es 'P',
+        se elimina para la consulta. La función construye el cuerpo de la solicitud para la API de consulta de persona,
+        registra la solicitud en el log, realiza la solicitud a la API, registra la respuesta, y verifica el código de estado
+        de la respuesta para retornar los datos correspondientes.
 
-    Args:
-        request (ConsultarPersonaBase): Objeto Pydantic que contiene el número de documento de la persona a consultar.
-        api_key (str): Clave API proporcionada por el cliente para autenticación, verificada mediante `Security`.
+        Args:
+            request (ConsultarPersonaBase): Objeto Pydantic que contiene el número de documento de la persona a consultar.
+            api_key (str): Clave API proporcionada por el cliente para autenticación, verificada mediante `Security`.
 
-    Returns:
-        dict: Un diccionario que contiene el estado de la respuesta ('success' o 'error') y los datos de la persona consultada
-              o el mensaje de error correspondiente.
+        Returns:
+            dict: Un diccionario que contiene el estado de la respuesta ('success' o 'error') y los datos de la persona consultada
+                  o el mensaje de error correspondiente.
     """
     # Extrae el número de documento de la solicitud y determina el tipo de documento
     num_document = request.dict(exclude_unset=True)["num_documento"]
@@ -71,15 +80,16 @@ def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api
     logger.info(f"Response status code: {response.status_code}")
     # Convierte la respuesta en JSON
     response_json = json.loads(response.content)
+    logger.info(f"Response: {response_json}")
 
     # Verifica el código de estado de la respuesta y retorna los datos correspondientes
     if response.status_code == 200:
-        return {"status": "success", "data": response_json}
+        return response_json["persona"]
 
-    return {"status": "error", "data": response_json}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
-@router.post("/crear_persona", summary="Crear persona en Seguros Mercantil")
+@router.post("/crear_persona", response_model=CreadaPersonaResponse, status_code=status.HTTP_201_CREATED, summary="Crear persona en Seguros Mercantil")
 def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una nueva persona en Seguros Mercantil.
@@ -128,16 +138,16 @@ def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_ver
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
-
+    logger.info(f"Response: {response_json}")
     # verificar si el request fue exitoso
     if response.status_code == 200:
-        return {"status": "success", "data": response_json}
+        return response_json["persona"][0]
 
-    return {"status": "error", "data": response_json}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
-@router.post("/crear_poliza", summary="Crear poliza de persona en Seguros Mercantil")
-def crear_poliza(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+@router.post("/crear_cotizacion", response_model=CotizacionResponse,  status_code=status.HTTP_200_OK, summary="Crear cotizacion de persona en Seguros Mercantil")
+def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -191,16 +201,17 @@ def crear_poliza(request: CrearPolizaBase, api_key: str = Security(api_key_verif
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
+    logger.info(f"Response: {response_json}")
 
     # verificar si el request fue exitoso
     if response.status_code == 200:
-        return {"status": "success", "data": response_json}
+        return response_json["cotizacion"]
 
-    return {"status": "error", "data": response_json}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
-@router.post("/emitir_poliza", summary="Emitir poliza de persona en Seguros Mercantil")
-def emitir_poliza(request: EmitirPolizaBase) -> dict:
+@router.post("/emitir_poliza", response_model=EmisionResponse, status_code=status.HTTP_201_CREATED, summary="Emitir poliza de persona en Seguros Mercantil")
+def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Emite una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -228,16 +239,17 @@ def emitir_poliza(request: EmitirPolizaBase) -> dict:
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
-
+    logger.info(f"Response: {response_json}")
     # verificar si el request fue exitoso
     if response.status_code == 200:
-        return {"status": "success", "data": response_json}
+        return response_json["emision"]
 
-    return {"status": "error", "data": response_json}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
-@router.post("/consultar_poliza", summary="Consultar poliza de persona en Seguros Mercantil")
-def consultar_poliza(request: ConsultarPolizaBase) -> dict:
+
+@router.post("/consultar_poliza", response_model=PolizasConsultaResponse, status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
+def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta los detalles de una póliza específica en Seguros Mercantil.
 
@@ -263,10 +275,11 @@ def consultar_poliza(request: ConsultarPolizaBase) -> dict:
     response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
-    response_json = json.loads(response.content)
+    response_json = json.loads(response.content)["polizas"]
+    logger.info(f"Response: {response_json}")
 
     # verificar si el request fue exitoso
     if response.status_code == 200:
-        return {"status": "success", "data": response_json}
+        return {"polizas":response_json}
 
-    return {"status": "error", "data": response_json}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
