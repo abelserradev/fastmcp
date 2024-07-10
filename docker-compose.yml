@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   integration_sm_api:
@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - TZ=America/Caracas
     container_name: integration_sm_api
     ports:
       - "9000:9000"
