@@ -144,3 +144,11 @@ class ConsultarPolizaBase(BaseModel):
     poliza: int
     certificado: int
     nu_recibo: int
+
+
+class InclusionAnexosPolizaBase(BaseModel):
+    cd_entidad: int
+    cd_area: int
+    nu_poliza: int
+    nm_primer_nombre: str
+    nm_primer_apellido: str

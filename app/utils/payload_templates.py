@@ -175,8 +175,39 @@ payload_consultar_persona = {
         "aplicacion": APPLICATION,
         "funcionalidad": "CONSULTAR_PERSONA_V",
         "usuario": USER,
-        "persona": {
-            "tp_documento": "VEN",
-            "nu_documento": "V-55555555"
-        }
+        "persona": {}
     }
+
+payload_inclusion_anexos_poliza = {
+    "aplicacion": APPLICATION,
+    "funcionalidad": "INCLUIR_ANEXO_POL_VIG_V",
+    "usuario": USER,
+    "cd_entidad": 1, # Debe ser 1
+    "cd_area": 1, # Debe ser 1
+    "nu_poliza": 1640, # variable no de poliza
+    "nu_certificado": 1, # Debe ser 1
+    "cd_area_anexo": 1, # Debe ser 1
+    "cd_anexo": 24, # variable.
+    "in_texto_definido": 1, # Debe ser 1
+    "tx_anexo_a_registrar": "", # debe ser ""
+    "tp_inclusion_anexo": "F", # debe ser "F"
+    "in_manual": 0, # debe ser 0
+    "datos_dinamicos": [
+        {
+            "cd_dato": "&CD_ENTIDAD",
+            "va_dato": "1" # debe ser "1"
+        },
+        {
+            "cd_dato": "&CD_AREA",
+            "va_dato": "1" # debe ser "1"
+        },
+        {
+            "cd_dato": "&NU_POLIZA",
+            "va_dato": "1640" # Variable no de poliza
+        },
+        {
+            "cd_dato": "&NM_ASEGURADO",
+            "va_dato": "Nombre Asegurado" # variable Nombre del asegurado.
+        }
+    ]
+}

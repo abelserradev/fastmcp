@@ -10,9 +10,16 @@ from fastapi import (
 import requests
 
 from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase, EmitirPolizaBase, \
-    ConsultarPolizaBase
-from app.api.Integration_SM.ResponseModelAPI import PersonaResponseBase, CreadaPersonaResponse, CotizacionResponse, \
-    CotizacionResponse, EmisionResponse, PolizasConsultaResponse
+    ConsultarPolizaBase, InclusionAnexosPolizaBase
+from app.api.Integration_SM.ResponseModelAPI import (
+    PersonaResponseBase,
+    CreadaPersonaResponse,
+    CotizacionResponse,
+    CotizacionResponse,
+    EmisionResponse,
+    PolizasConsultaResponse,
+    AnexosConsultaResponse
+)
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.LoggerSingleton import logger
 from app.utils.configs import (
@@ -22,13 +29,19 @@ from app.utils.configs import (
 )
 from app.utils.constants import (
     tipo_documento,
-    frecuencia_cuota, url_consult_persona, url_crear_persona, url_crear_poliza, url_emitir_poliza, headers,
-    url_consultar_poliza
+    frecuencia_cuota,
+    url_consult_persona,
+    url_crear_persona,
+    url_crear_poliza,
+    url_emitir_poliza,
+    headers,
+    url_consultar_poliza,
+    url_inclusion_anexos_poliza
 )
 from app.utils.payload_templates import (
     payload_persona,
     payload_cotizacion,
-    payload_emitir_poliza, payload_consultar_poliza, payload_consultar_persona
+    payload_emitir_poliza, payload_consultar_poliza, payload_consultar_persona, payload_inclusion_anexos_poliza
 )
 
 router = APIRouter(
@@ -38,8 +51,7 @@ router = APIRouter(
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 
-
-@router.post("/consultar_persona", response_model=PersonaResponseBase, status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
+@router.post("/consultar_persona",  status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
 def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta la información de una persona en Seguros Mercantil utilizando su número de documento.
@@ -67,8 +79,8 @@ def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api
 
     # Prepara el cuerpo de la solicitud para la API
     body = payload_consultar_persona.copy()
-    body["tp_documento"] = tp_document,
-    body["nu_documento"] = num_document
+    body["persona"]["tp_documento"] = tp_document
+    body["persona"]["nu_documento"] = num_document
 
     # Registra la solicitud en el log
     logger.info(f"body: {body}")
@@ -247,7 +259,6 @@ def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_ver
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
-
 @router.post("/consultar_poliza", response_model=PolizasConsultaResponse, status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
 def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
@@ -281,5 +292,39 @@ def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_k
     # verificar si el request fue exitoso
     if response.status_code == 200:
         return {"polizas":response_json}
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+
+
+@router.post("/incluir_anexo", response_model=AnexosConsultaResponse, status_code=status.HTTP_200_OK, summary="Incluir anexo poliza en Seguros Mercantil")
+def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+    data = request.dict(exclude_unset=True)
+    name = f"{data['nm_primer_nombre']} {data['nm_primer_apellido']}"
+    body = payload_inclusion_anexos_poliza.copy()
+    body['cd_entidad'] = data['cd_entidad']
+    body['cd_area'] = data['cd_area']
+    body["nu_poliza"] = data["nu_poliza"]
+    # body["cd_anexo"]  = data["cd_anexo"]
+    datos_dinamicos = body["datos_dinamicos"].copy()
+
+    items = []
+    for item in datos_dinamicos:
+        if item["cd_dato"] == "&NU_POLIZA":
+            item["va_dato"] = str(data["nu_poliza"])
+        if item["cd_dato"] == "&NM_ASEGURADO":
+            item["va_dato"] = name
+        items.append(item)
+
+    body["datos_dinamicos"] = items
+
+    response = requests.post(url_inclusion_anexos_poliza, data=json.dumps(body), headers=headers)
+    logger.info(f"Response status code: {response.status_code}")
+    #convertir response to JSON
+    response_json = json.loads(response.content)
+    logger.info(f"Response: {response_json}")
+
+    #verificar si el request fue exitoso
+    if response.status_code == 200:
+       return {"anexo": response_json["anexo"]}
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)

@@ -322,3 +322,33 @@ class PolizaConsultaResponse(BaseModel):
 
 class PolizasConsultaResponse(BaseModel):
     polizas: List[PolizaConsultaResponse]
+
+
+class AnexoResponse(BaseModel):
+    cd_persona_asegurada: str
+    nm_anexo: str
+    nu_consecutivo_anexo: str
+    nu_certificado: str
+    fe_exclusion: str
+    tp_inclusion_anexo: str
+    cd_producto: str
+    fe_inclusion: str
+    in_manual: str
+    de_st_certificado: str
+    cd_area_anexo: str
+    de_tp_inclusion_anexo: str
+    nm_zonarazonsocial: str
+    nu_poliza: str
+    de_entidad: str
+    de_cd_area: str
+    cd_entidad: str
+    cd_anexo: str
+    cd_area: str
+    de_producto: str
+    st_certificado: str
+    nu_endoso: str
+
+
+class AnexosConsultaResponse(BaseModel):
+    anexo: List[AnexoResponse]
+
