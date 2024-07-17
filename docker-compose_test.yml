@@ -15,14 +15,10 @@ services:
     networks:
       - integration_sm_api
     restart: always
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: cuida-salud-prod-logs
-        awslogs-stream: integration-fastapi-logs
 
 
 
 networks:
   integration_sm_api:
     driver: bridge
+
