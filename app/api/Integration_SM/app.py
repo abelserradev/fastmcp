@@ -339,7 +339,7 @@ def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Securit
     body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
     body["polizas-recibos"][0]["poliza"] = data["poliza"]
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
-    del body["polizas-recibos"][0]["nu_recibo"]
+    # del body["polizas-recibos"][0]["nu_recibo"]
 
     response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")

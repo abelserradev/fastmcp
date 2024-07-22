@@ -172,7 +172,6 @@ payload_consultar_poliza = {
         "cd_area": 71,
         "poliza": 145821,
         "certificado": 1,
-        "nu_recibo": 1028810
     }]
 }
 
