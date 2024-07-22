@@ -152,3 +152,10 @@ class InclusionAnexosPolizaBase(BaseModel):
     nu_poliza: int
     nm_primer_nombre: str
     nm_primer_apellido: str
+
+
+class ConsultarRecibosPolizaBase(BaseModel):
+    cd_entidad: int
+    cd_area: int
+    poliza: int
+    certificado: int
