@@ -1,7 +1,7 @@
 from datetime import datetime, date
 
 from pydantic import BaseModel, Field, EmailStr, validator
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 from enum import Enum
 
 
@@ -85,7 +85,7 @@ class PolizaBase(BaseModel):
     fe_desde: Union[datetime, str]  # Aceptar tanto datetime como str
     fe_hasta: Union[datetime, str]  # Aceptar tanto datetime como str
     frecuencia_cuota: FrecuenciaCuota
-    suma_asegurada: float
+    suma_asegurada: Optional[int] = 250
 
     @validator('fe_desde', pre=True)
     def validate_fe_desde(cls, v):

@@ -177,8 +177,9 @@ def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_v
     """
 
     data = request.dict(exclude_unset=True)
+    logger.info(f"data: {data}")
     fecha_nacimiento = data["persona"]["fecha_nacimiento"].strftime("%d-%m-%Y")
-    suma_poliza = data["poliza"]["suma_asegurada"]
+    suma_poliza = data["poliza"]["suma_asegurada"] if "suma_asegurada" in data["poliza"].keys() else 250
     fe_desde = data["poliza"]["fe_desde"].strftime("%d/%m/%Y")
     fe_hasta = data["poliza"]["fe_hasta"].strftime("%d/%m/%Y")
     cd_plan_pago = frecuencia_cuota[data["poliza"]["frecuencia_cuota"].value]

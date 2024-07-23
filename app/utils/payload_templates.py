@@ -61,7 +61,7 @@ payload_cotizacion = {
             {
                 "cd_dato": 990150, # Suma asegurada
                 "nu_bien": 1,
-                "valor": 5000 # variable
+                "valor": 250
             },
             {
                 "cd_dato": 990140, # país residencia ven 29.
