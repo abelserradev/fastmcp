@@ -159,3 +159,7 @@ class ConsultarRecibosPolizaBase(BaseModel):
     cd_area: int
     poliza: int
     certificado: int
+
+
+class GetPolizasBase(BaseModel):
+    polizas: List[ConsultarRecibosPolizaBase]

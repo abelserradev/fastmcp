@@ -10,7 +10,7 @@ from fastapi import (
 import requests
 
 from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase, EmitirPolizaBase, \
-    ConsultarPolizaBase, InclusionAnexosPolizaBase, ConsultarRecibosPolizaBase
+    ConsultarPolizaBase, InclusionAnexosPolizaBase, ConsultarRecibosPolizaBase, GetPolizasBase
 from app.api.Integration_SM.ResponseModelAPI import (
     PersonaResponseBase,
     CreadaPersonaResponse,
@@ -345,11 +345,30 @@ def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Securit
     response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
-    response_json = json.loads(response.content)["polizas"]
-
-
+    response_json = json.loads(response.content)
+    logger.info(f"Response: {response_json}")
+    polizas = response_json["polizas"]
     # verificar si el request fue exitoso
     if response.status_code == 200:
-        return {"polizas":response_json}
+        return {"polizas":polizas}
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+
+
+# @router.post("/get_polizas", status_code=status.HTTP_200_OK, summary="Obtener polizas y sus recibos en Seguros Mercantil")
+# def get_polizas(request: GetPolizasBase):
+#
+#     data = request.dict(exclude_unset=True)
+#     body = payload_consultar_poliza.copy()
+#     body["polizas-recibos"] = data["polizas"]
+#
+#     response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
+#     logger.info(f"Response status code: {response.status_code}")
+#     # convertir response to JSON
+#     response_json = json.loads(response.content)["polizas"]
+#
+#     # verificar si el request fue exitoso
+#     if response.status_code == 200:
+#         return {"polizas": response_json}
+#
+#     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)

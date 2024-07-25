@@ -1,4 +1,4 @@
-FROM python:3.11.7-slim-bookworm as builder
+FROM python:3.11.7-slim-bookworm AS builder
 ENV PATH /usr/local/bin:$PATH
 RUN apt-get update -qq && apt-get install -y --no-install-recommends --no-install-suggests \
     build-essential \
@@ -35,7 +35,7 @@ RUN poetry export --without-hashes --format=requirements.txt > requirements.txt
 RUN pip install -r requirements.txt --no-cache-dir  --disable-pip-version-check
 
 
-FROM python:3.11.7-slim-bookworm as app
+FROM python:3.11.7-slim-bookworm AS app
 
 WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
