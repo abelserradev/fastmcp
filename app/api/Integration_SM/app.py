@@ -347,7 +347,7 @@ def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Securit
     # convertir response to JSON
     response_json = json.loads(response.content)
     logger.info(f"Response: {response_json}")
-    polizas = response_json["polizas"]
+    polizas = response_json.get("polizas", [])
     # verificar si el request fue exitoso
     if response.status_code == 200:
         return {"polizas":polizas}
