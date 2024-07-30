@@ -52,7 +52,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 
 @router.post("/consultar_persona",  status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
-async def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta la información de una persona en Seguros Mercantil utilizando su número de documento.
 
@@ -88,7 +88,7 @@ async def consultar_persona(request: ConsultarPersonaBase, api_key: str = Securi
     logger.info(f"url_consult_persona: {url_consult_persona}")
 
     # Realiza la solicitud a la API y registra la respuesta
-    response = await requests.post(url_consult_persona, data=json.dumps(body), headers=headers)
+    response =  requests.post(url_consult_persona, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # Convierte la respuesta en JSON
     response_json = json.loads(response.content)
@@ -102,7 +102,7 @@ async def consultar_persona(request: ConsultarPersonaBase, api_key: str = Securi
 
 
 @router.post("/crear_persona", response_model=CreadaPersonaResponse, status_code=status.HTTP_201_CREATED, summary="Crear persona en Seguros Mercantil")
-async def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una nueva persona en Seguros Mercantil.
 
@@ -146,7 +146,7 @@ async def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_k
     logger.info(f"headers: {headers}")
     logger.info(f"url_crear_persona: {url_crear_persona}")
 
-    response = await requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
+    response = requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
@@ -159,7 +159,7 @@ async def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_k
 
 
 @router.post("/crear_cotizacion", response_model=CotizacionResponse,  status_code=status.HTTP_200_OK, summary="Crear cotizacion de persona en Seguros Mercantil")
-async def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -210,7 +210,7 @@ async def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api
     body["coll_datos"] = coll_datos
     logger.info(f"data: {body}")
 
-    response = await requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
+    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
@@ -224,7 +224,7 @@ async def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api
 
 
 @router.post("/emitir_poliza", response_model=EmisionResponse, status_code=status.HTTP_201_CREATED, summary="Emitir poliza de persona en Seguros Mercantil")
-async def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Emite una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -248,7 +248,7 @@ async def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_k
     body["coll_generales"]["generales"][0]["nu_cotizacion"] = data["nu_cotizacion"]
     logger.info(f"Body: {body}")
 
-    response = await requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
+    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
@@ -261,7 +261,7 @@ async def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_k
 
 
 @router.post("/consultar_poliza", response_model=PolizasConsultaResponse, status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
-async def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta los detalles de una póliza específica en Seguros Mercantil.
 
@@ -284,7 +284,7 @@ async def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
     body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
 
-    response = await requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
+    response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)["polizas"]
@@ -298,7 +298,7 @@ async def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security
 
 
 @router.post("/incluir_anexo", response_model=AnexosConsultaResponse, status_code=status.HTTP_200_OK, summary="Incluir anexo poliza en Seguros Mercantil")
-async def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     data = request.dict(exclude_unset=True)
     name = f"{data['nm_primer_nombre']} {data['nm_primer_apellido']}"
     body = payload_inclusion_anexos_poliza.copy()
@@ -318,7 +318,7 @@ async def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Secur
 
     body["datos_dinamicos"] = items
 
-    response = await requests.post(url_inclusion_anexos_poliza, data=json.dumps(body), headers=headers)
+    response = requests.post(url_inclusion_anexos_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     #convertir response to JSON
     response_json = json.loads(response.content)
@@ -332,7 +332,7 @@ async def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Secur
 
 
 @router.post("/consultar_recibos", status_code=status.HTTP_200_OK, summary="Consultar recibos de una poliza de persona en Seguros Mercantil")
-async def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
 
     data = request.dict(exclude_unset=True)
     body = payload_consultar_poliza.copy()
@@ -342,7 +342,7 @@ async def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = S
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
     # del body["polizas-recibos"][0]["nu_recibo"]
 
-    response = await requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
+    response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
     logger.info(f"Response status code: {response.status_code}")
     # convertir response to JSON
     response_json = json.loads(response.content)
