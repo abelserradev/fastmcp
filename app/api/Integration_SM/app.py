@@ -259,8 +259,8 @@ def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_ver
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
-
-@router.post("/consultar_poliza", response_model=PolizasConsultaResponse, status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
+# response_model=PolizasConsultaResponse,
+@router.post("/consultar_poliza", status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
 def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta los detalles de una póliza específica en Seguros Mercantil.
@@ -332,7 +332,7 @@ def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(ap
 
 
 @router.post("/consultar_recibos", status_code=status.HTTP_200_OK, summary="Consultar recibos de una poliza de persona en Seguros Mercantil")
-def consultar_poliza(request: ConsultarRecibosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+def consultar_recibos(request: ConsultarRecibosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
 
     data = request.dict(exclude_unset=True)
     body = payload_consultar_poliza.copy()
