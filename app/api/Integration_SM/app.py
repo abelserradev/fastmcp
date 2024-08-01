@@ -5,9 +5,12 @@ from fastapi import (
     APIRouter,
     Security,
     HTTPException,
-    status
+    status,
+    Depends
 )
 import requests
+import httpx
+from app.utils.AsyncHttpx import get_client
 
 from app.api.Integration_SM.ModelAPI import ConsultarPersonaBase, CrearPersonaBase, CrearPolizaBase, EmitirPolizaBase, \
     ConsultarPolizaBase, InclusionAnexosPolizaBase, ConsultarRecibosPolizaBase, GetPolizasBase
@@ -52,7 +55,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 
 @router.post("/consultar_persona",  status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
-def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def consultar_persona(request: ConsultarPersonaBase, client: httpx.AsyncClient = Depends(get_client),api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta la información de una persona en Seguros Mercantil utilizando su número de documento.
 
@@ -88,21 +91,29 @@ def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api
     logger.info(f"url_consult_persona: {url_consult_persona}")
 
     # Realiza la solicitud a la API y registra la respuesta
-    response =  requests.post(url_consult_persona, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # Convierte la respuesta en JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
+    try:
+        response =  await client.post(url_consult_persona, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # Convierte la respuesta en JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
+        logger.info(f"{response.status_code}")
+        # Verifica el código de estado de la respuesta y retorna los datos correspondientes
+        if response.status_code == 200:
+            return response_json["persona"]
+        if response.status_code == 400:
+            message = response_json.get("mensajes", "Error en la solicitud")[0]["mensaje"]
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=message)
 
-    # Verifica el código de estado de la respuesta y retorna los datos correspondientes
-    if response.status_code == 200:
-        return response_json["persona"]
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
-
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
 @router.post("/crear_persona", response_model=CreadaPersonaResponse, status_code=status.HTTP_201_CREATED, summary="Crear persona en Seguros Mercantil")
-def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def crear_persona(request: CrearPersonaBase, client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una nueva persona en Seguros Mercantil.
 
@@ -145,21 +156,28 @@ def crear_persona(request: CrearPersonaBase, api_key: str = Security(api_key_ver
     logger.info(f"body: {json.dumps(body)}")
     logger.info(f"headers: {headers}")
     logger.info(f"url_crear_persona: {url_crear_persona}")
+    try:
+        response = await client.post(url_crear_persona, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return response_json["persona"][0]
 
-    response = requests.post(url_crear_persona, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return response_json["persona"][0]
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
 
 
 @router.post("/crear_cotizacion", response_model=CotizacionResponse,  status_code=status.HTTP_200_OK, summary="Crear cotizacion de persona en Seguros Mercantil")
-def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def crear_cotizacion(request: CrearPolizaBase, client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
     """
         Crea una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -209,22 +227,28 @@ def crear_cotizacion(request: CrearPolizaBase, api_key: str = Security(api_key_v
 
     body["coll_datos"] = coll_datos
     logger.info(f"data: {body}")
+    try:
+        response = await client.post(url_crear_poliza, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
 
-    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return response_json["cotizacion"]
 
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return response_json["cotizacion"]
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
 
 @router.post("/emitir_poliza", response_model=EmisionResponse, status_code=status.HTTP_201_CREATED, summary="Emitir poliza de persona en Seguros Mercantil")
-def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def emitir_poliza(request: EmitirPolizaBase, client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
     """
         Emite una póliza de seguro para una persona en Seguros Mercantil.
 
@@ -247,21 +271,27 @@ def emitir_poliza(request: EmitirPolizaBase, api_key: str = Security(api_key_ver
     body["coll_generales"]["generales"][0]["cd_entidad"] = data["cd_entidad"]
     body["coll_generales"]["generales"][0]["nu_cotizacion"] = data["nu_cotizacion"]
     logger.info(f"Body: {body}")
+    try:
+        response = await client.post(url_crear_poliza, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return response_json["emision"]
 
-    response = requests.post(url_crear_poliza, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return response_json["emision"]
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
 # response_model=PolizasConsultaResponse,
 @router.post("/consultar_poliza", status_code=status.HTTP_200_OK, summary="Consultar poliza de persona en Seguros Mercantil")
-def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def consultar_poliza(request: ConsultarPolizaBase,client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
     """
         Consulta los detalles de una póliza específica en Seguros Mercantil.
 
@@ -284,21 +314,28 @@ def consultar_poliza(request: ConsultarPolizaBase, api_key: str = Security(api_k
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
     body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
 
-    response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = json.loads(response.content)["polizas"]
-    logger.info(f"Response: {response_json}")
+    try:
+        response = await client.post(url_consultar_poliza, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = response.json()["polizas"]
+        logger.info(f"Response: {response_json}")
 
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return {"polizas":response_json}
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return {"polizas":response_json}
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
 
 @router.post("/incluir_anexo", response_model=AnexosConsultaResponse, status_code=status.HTTP_200_OK, summary="Incluir anexo poliza en Seguros Mercantil")
-def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def incluir_anexo(request: InclusionAnexosPolizaBase, client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
     data = request.dict(exclude_unset=True)
     name = f"{data['nm_primer_nombre']} {data['nm_primer_apellido']}"
     body = payload_inclusion_anexos_poliza.copy()
@@ -317,22 +354,28 @@ def incluir_anexo(request: InclusionAnexosPolizaBase, api_key: str = Security(ap
         items.append(item)
 
     body["datos_dinamicos"] = items
+    try:
+        response = await client.post(url_inclusion_anexos_poliza, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        #convertir response to JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
 
-    response = requests.post(url_inclusion_anexos_poliza, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    #convertir response to JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
+        #verificar si el request fue exitoso
+        if response.status_code == 200:
+           return {"anexo": response_json["anexo"]}
 
-    #verificar si el request fue exitoso
-    if response.status_code == 200:
-       return {"anexo": response_json["anexo"]}
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
 
 
 @router.post("/consultar_recibos", status_code=status.HTTP_200_OK, summary="Consultar recibos de una poliza de persona en Seguros Mercantil")
-def consultar_recibos(request: ConsultarRecibosPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+async def consultar_recibos(request: ConsultarRecibosPolizaBase, client: httpx.AsyncClient = Depends(get_client), api_key: str = Security(api_key_verifier)) -> dict:
 
     data = request.dict(exclude_unset=True)
     body = payload_consultar_poliza.copy()
@@ -341,16 +384,21 @@ def consultar_recibos(request: ConsultarRecibosPolizaBase, api_key: str = Securi
     body["polizas-recibos"][0]["poliza"] = data["poliza"]
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
     # del body["polizas-recibos"][0]["nu_recibo"]
+    try:
+        response = await client.post(url_consultar_poliza, data=json.dumps(body), headers=headers, timeout=None)
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = json.loads(response.content)
+        logger.info(f"Response: {response_json}")
+        polizas = response_json.get("polizas", [])
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return {"polizas":polizas}
 
-    response = requests.post(url_consultar_poliza, data=json.dumps(body), headers=headers)
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = json.loads(response.content)
-    logger.info(f"Response: {response_json}")
-    polizas = response_json.get("polizas", [])
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return {"polizas":polizas}
-
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
-
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Tiempo de espera excedido")
