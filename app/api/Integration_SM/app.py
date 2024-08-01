@@ -50,10 +50,6 @@ router = APIRouter(
 
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
-@router.get("/pruebas")
-def pruebas():
-    return {"message": "Hello World"}
-
 
 @router.post("/consultar_persona",  status_code=status.HTTP_200_OK, summary="Consultar persona en Seguros Mercantil")
 def consultar_persona(request: ConsultarPersonaBase, api_key: str = Security(api_key_verifier)) -> dict:
