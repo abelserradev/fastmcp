@@ -61,7 +61,7 @@ payload_cotizacion = {
             {
                 "cd_dato": 990150, # Suma asegurada
                 "nu_bien": 1,
-                "valor": 5000 # variable
+                "valor": 250
             },
             {
                 "cd_dato": 990140, # país residencia ven 29.
@@ -90,6 +90,11 @@ payload_cotizacion = {
             },
             {
                 "cd_dato": 100135, # Gastos médicos
+                "nu_bien": 1,
+                "valor": "1"
+            },
+            {
+                "cd_dato": 100150,
                 "nu_bien": 1,
                 "valor": "1"
             }
@@ -122,7 +127,7 @@ payload_cotizacion = {
                 "cd_plan_pago": 204, # códigos mensual: 201, trimestral: 202, semestral: 203, anual:204
                 "cd_frecuencia_cuota": "", # Dejar en blanco
                 "ca_cuota": "", # Dejar en blanco
-                "cd_canal_venta": 46,
+                "cd_canal_venta": 39,
                 "cd_sucursal": "1",
                 "nu_documento_contratante": "V-15500500", # Variable
                 "tp_documento_contratante": "VEN", # Variable
@@ -167,7 +172,6 @@ payload_consultar_poliza = {
         "cd_area": 71,
         "poliza": 145821,
         "certificado": 1,
-        "nu_recibo": 1028810
     }]
 }
 

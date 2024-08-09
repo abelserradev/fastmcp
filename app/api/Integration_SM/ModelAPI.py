@@ -1,7 +1,7 @@
 from datetime import datetime, date
 
 from pydantic import BaseModel, Field, EmailStr, validator
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 from enum import Enum
 
 
@@ -17,14 +17,14 @@ class Sexo(Enum):
 
 class ConsultarPersonaBase(BaseModel):
 
-    num_documento: str = Field(..., pattern=r'^[VEP]-\d{7,8}$')
+    num_documento: str = Field(..., pattern=r'^[VEP]-\d{5,30}$')
     #tipo_documento: TipoDocumento
 
 
 
 class DocumentoBase(BaseModel):
     #tp_documento: TipoDocumento
-    nu_documento: str = Field(..., pattern=r'^[VEP]-\d{7,20}$')
+    nu_documento: str = Field(..., pattern=r'^[VEP]-\d{5,30}$')
 
 
 class ContactoBase(BaseModel):
@@ -85,7 +85,7 @@ class PolizaBase(BaseModel):
     fe_desde: Union[datetime, str]  # Aceptar tanto datetime como str
     fe_hasta: Union[datetime, str]  # Aceptar tanto datetime como str
     frecuencia_cuota: FrecuenciaCuota
-    suma_asegurada: float
+    suma_asegurada: Optional[int] = 250
 
     @validator('fe_desde', pre=True)
     def validate_fe_desde(cls, v):
@@ -152,3 +152,14 @@ class InclusionAnexosPolizaBase(BaseModel):
     nu_poliza: int
     nm_primer_nombre: str
     nm_primer_apellido: str
+
+
+class ConsultarRecibosPolizaBase(BaseModel):
+    cd_entidad: int
+    cd_area: int
+    poliza: int
+    certificado: int
+
+
+class GetPolizasBase(BaseModel):
+    polizas: List[ConsultarRecibosPolizaBase]
