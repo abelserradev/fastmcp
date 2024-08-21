@@ -91,7 +91,7 @@ payload_cotizacion = {
             {
                 "cd_dato": 100135, # Gastos médicos
                 "nu_bien": 1,
-                "valor": "1"
+                "valor": "0"
             },
             {
                 "cd_dato": 100150,
