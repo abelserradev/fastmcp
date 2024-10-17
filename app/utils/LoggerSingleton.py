@@ -1,5 +1,6 @@
-from loguru import logger
 import sys
+
+from loguru import logger
 
 
 # Define a singleton class for the logger
@@ -14,7 +15,11 @@ class LoggerSingleton:
             # Remove any existing handlers
             logger.remove()
             # Add a new handler with custom settings
-            logger.add(sys.stdout, colorize=True, format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>")
+            logger.add(
+                sys.stdout,
+                colorize=True,
+                format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>",
+            )
             # Assign the logger instance to the _instance attribute
             cls._instance = logger
         # Return the instance
@@ -22,4 +27,4 @@ class LoggerSingleton:
 
 
 # Create a logger instance
-logger = LoggerSingleton()
+logger = LoggerSingleton() # noqa: F811
