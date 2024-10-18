@@ -31,7 +31,7 @@ from app.utils.payload_templates import (payload_consultar_persona,
                                          payload_persona)
 
 router = APIRouter(
-    tags=["MS Integration Version 1"],
+    tags=["MS Integration Version 2"],
 )
 
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
