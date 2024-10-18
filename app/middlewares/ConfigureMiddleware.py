@@ -24,6 +24,6 @@ def configure_middleware(app):
     app.add_middleware(middlewares.ErrorHandlingMiddleware)
     app.add_middleware(middlewares.LoggingMiddleware)
     app.add_middleware(middlewares.ProcessTimeHeaderMiddleware)
-    if ENV in ["production", "staging"]:
-        app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOST)
-        app.add_middleware(HTTPSRedirectMiddleware)
+    # if ENV in ["production", "staging"]:
+        # app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOST)
+        #app.add_middleware(HTTPSRedirectMiddleware)
