@@ -1,11 +1,8 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app import middlewares
-from app.utils.configs import ALLOWED_HOST, ENV
-from app.utils.constants import CORS_CONFIG
+from app.utils.v1.constants import CORS_CONFIG
 
 # from starlette_csrf import CSRFMiddleware
 
@@ -21,7 +18,7 @@ def configure_middleware(app):
 
     # app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
     # Los middlewares personalizados
-    app.add_middleware(middlewares.ErrorHandlingMiddleware)
+    #app.add_middleware(middlewares.ErrorHandlingMiddleware)
     app.add_middleware(middlewares.LoggingMiddleware)
     app.add_middleware(middlewares.ProcessTimeHeaderMiddleware)
     # if ENV in ["production", "staging"]:

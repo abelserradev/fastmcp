@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.utils.LoggerSingleton import logger
+from app.utils.v1.LoggerSingleton import logger
 
 
 # Define a Settings class that inherits from BaseSettings
@@ -17,7 +17,8 @@ class Settings(BaseSettings):
     SUBSCRIPTION_KEY: str
     ENV: str
     ALLOWED_HOST: str
-
+    SUMA_ASEGURADA: int
+    MODE_API_MOCKUP:  bool
     # Load the settings from the .env file
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -45,5 +46,7 @@ APPLICATION = settings.APPLICATION
 SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
 ENV = settings.ENV
 ALLOWED_HOST = settings.ALLOWED_HOST
+SUMA_ASEGURADA = settings.SUMA_ASEGURADA
+MODE_API_MOCKUP = settings.MODE_API_MOCKUP
 # Log that the settings have been loaded
 logger.info("Settings loaded")

@@ -1,4 +1,4 @@
-from app.utils.configs import APPLICATION, USER
+from app.utils.v1.configs import APPLICATION, USER
 
 payload_persona = {
     "aplicacion": APPLICATION,

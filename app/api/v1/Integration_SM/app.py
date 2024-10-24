@@ -15,20 +15,20 @@ from app.schemas.v1.Integration_SM.ResponseModelAPI import (AnexosConsultaRespon
                                                             CreadaPersonaResponse,
                                                             EmisionResponse)
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.utils.AsyncHttpx import get_client, fetch_url
-from app.utils.configs import API_KEY_AUTH
-from app.utils.constants import (frecuencia_cuota, headers, tipo_documento,
-                                 url_consult_persona, url_consultar_poliza,
-                                 url_crear_persona, url_crear_poliza,
-                                 url_emitir_poliza,
-                                 url_inclusion_anexos_poliza)
-from app.utils.LoggerSingleton import logger
-from app.utils.payload_templates import (payload_consultar_persona,
-                                         payload_consultar_poliza,
-                                         payload_cotizacion,
-                                         payload_emitir_poliza,
-                                         payload_inclusion_anexos_poliza,
-                                         payload_persona)
+from app.utils.v1.AsyncHttpx import get_client, fetch_url
+from app.utils.v1.configs import API_KEY_AUTH
+from app.utils.v1.constants import (frecuencia_cuota, headers, tipo_documento,
+                                    url_consult_persona, url_consultar_poliza,
+                                    url_crear_persona, url_crear_poliza,
+                                    url_emitir_poliza,
+                                    url_inclusion_anexos_poliza)
+from app.utils.v1.LoggerSingleton import logger
+from app.utils.v1.payload_templates import (payload_consultar_persona,
+                                            payload_consultar_poliza,
+                                            payload_cotizacion,
+                                            payload_emitir_poliza,
+                                            payload_inclusion_anexos_poliza,
+                                            payload_persona)
 
 router = APIRouter(
     tags=["MS Integration Version 1"],

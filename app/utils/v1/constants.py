@@ -1,4 +1,4 @@
-from app.utils.configs import SM_ENDPOINT, SUBSCRIPTION_KEY
+from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
 
@@ -11,6 +11,7 @@ url_crear_poliza = f"{SM_ENDPOINT}/cotizaraccpersonales"
 url_emitir_poliza = f"{SM_ENDPOINT}/emitirpoliza"
 url_consultar_poliza = f"{SM_ENDPOINT}/consultarpoliza"
 url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
+url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
 
 headers = {
     "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
@@ -26,4 +27,12 @@ CORS_CONFIG = {
     "allow_credentials":True,
     "allow_methods":["*"],  # Allow all methods
     "allow_headers":["*"]  # Allow all headers
+}
+
+PARENTESCO = {
+    "CONYUGUE": 2,
+    "HIJO": 3,
+    "PADRE": 6,
+    "MADRE": 7,
+    "OTROS": 13
 }
