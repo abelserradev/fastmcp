@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.Integration_SM.app import router as api_router_v1
 from app.middlewares.ConfigureMiddleware import configure_middleware
 from app.api.v2.Integration_SM.app import router as api_router_v2
-from app.utils.LoggerSingleton import logger
+from app.utils.v1.LoggerSingleton import logger
 
 app = FastAPI(
     title="Asistensi Integración Seguros Mercantil",  # The title of the API

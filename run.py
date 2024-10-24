@@ -1,7 +1,7 @@
 import uvicorn
 
-from app.utils.LoggerSingleton import logger
-from app.utils.configs import ENV
+from app.utils.v1.LoggerSingleton import logger
+from app.utils.v1.configs import ENV
 
 def main():
     if ENV in ["production", "staging"]:
