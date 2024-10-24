@@ -15,7 +15,8 @@ from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
     tipo_documento,
-    url_cotizar
+    url_cotizar,
+    NU_TOTAL_CUOTAS
 )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.mockup_response_cotizacion import cotizacion
@@ -103,6 +104,7 @@ async def crear_cotizacion(
         response["cd_plan_pago"] = cd_plan_pago
         response["de_plan_pago"] = data["poliza"]["frecuencia_cuota"].value.capitalize()
         response["bienes"][0]["de_bien"] = fullname
+        response["nu_total_cuota"] = NU_TOTAL_CUOTAS[data["poliza"]["frecuencia_cuota"].value]
         return response
 
     try:
