@@ -36,3 +36,10 @@ PARENTESCO = {
     "MADRE": 7,
     "OTROS": 13
 }
+
+NU_TOTAL_CUOTAS = {
+    "MENSUAL": 12,
+    "TRIMESTRAL": 4,
+    "SEMESTRAL": 2,
+    "ANUAL": 1
+}
