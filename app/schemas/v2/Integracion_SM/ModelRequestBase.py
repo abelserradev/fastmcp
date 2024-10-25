@@ -91,3 +91,14 @@ class CrearPolizaBase(BaseModel):
     """
     persona: PersonaPolizaBase
     poliza: PolizaBase
+
+
+class DatosPolizaBase(BaseModel):
+    cd_entidad: int
+    cd_area: int
+    nu_poliza: int
+    nu_certificado: int
+    nu_endoso: int
+
+class SolicitudCuadroPolizaBase(BaseModel):
+    datos_poliza: DatosPolizaBase
