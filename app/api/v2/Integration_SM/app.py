@@ -1,28 +1,33 @@
+import base64
 import json
+from ast import Bytes
+from io import BytesIO
+
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 
-
-#from app.schemas.v1.Integration_SM.ResponseModelAPI import CotizacionResponse
+from fastapi.responses import (
+    StreamingResponse,
+    FileResponse
+)
 
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase
+from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase,  SolicitudCuadroPolizaBase
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
-#from app.utils.v1.AsyncHttpx import get_client, fetch_url
+
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
 from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
     tipo_documento,
     url_cotizar,
-    NU_TOTAL_CUOTAS
+    NU_TOTAL_CUOTAS, url_cuadro_poliza
 )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.mockup_response_cotizacion import cotizacion
 
-from app.utils.v2.payload_templates import payload_cotizacion
-
+from app.utils.v2.payload_templates import payload_cotizacion, payload_cuadro_poliza
 
 router = APIRouter(
     tags=["MS Integration Version 2"],
@@ -49,7 +54,7 @@ async def crear_cotizacion(
         client: Async HTTP client dependency used to make network requests.
         api_key: API key for security verification.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
 
 
@@ -131,3 +136,53 @@ async def crear_cotizacion(
             detail="Tiempo de espera excedido",
         )
 
+
+
+
+@router.post(
+    "/cuadro_poliza",
+    response_class=FileResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Devuelve pdf con el cuadro de póliza",
+)
+async def get_cuadro_poliza(
+    request: SolicitudCuadroPolizaBase,
+    api_key: str = Security(api_key_verifier),
+):
+    data = request.model_dump(exclude_unset=True)
+    body = payload_cuadro_poliza.copy()
+    logger.info(f"data: {data}")
+    body["datos_poliza"] = data["datos_poliza"]
+    logger.info(f"{json.dumps(body)}")
+
+    try:
+        response = await fetch_url(
+            "POST",
+            url_cuadro_poliza,
+            headers,
+            body
+        )
+        logger.info(f"Response status code: {response.status_code}")
+        response_json = response.json()
+        reporte_codificado = response_json["reporte_codificado"]
+
+        # Decodificar base64 a PDF
+        pdf_content = base64.b64decode(reporte_codificado)
+        pdf_stream = BytesIO(pdf_content)
+
+        if response.status_code == 200 and response_json["status"]["code"] == "EXITO":
+            return StreamingResponse(pdf_stream, media_type="application/pdf")
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )

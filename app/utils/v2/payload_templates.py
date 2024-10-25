@@ -178,3 +178,17 @@ payload_cotizacion = {
     },
     "coll_grpaseg": {"grpaseg": []},
 }
+
+
+payload_cuadro_poliza = {
+    "funcionalidad": "OBTENER_CUADRO_POLIZA",
+    "aplicacion": APPLICATION,
+    "usuario": USER,
+    "datos_poliza": {
+        "cd_entidad": 0,
+        "cd_area": 0,
+        "nu_poliza": 0,
+        "nu_certificado": 0,
+        "nu_endoso": 0
+    }
+}

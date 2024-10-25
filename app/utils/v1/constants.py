@@ -12,6 +12,7 @@ url_emitir_poliza = f"{SM_ENDPOINT}/emitirpoliza"
 url_consultar_poliza = f"{SM_ENDPOINT}/consultarpoliza"
 url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
 url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
+url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/ve/pru/executeRep"
 
 headers = {
     "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
