@@ -22,7 +22,7 @@ from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.mockup_response_cotizacion import cotizacion
 
 from app.utils.v2.payload_templates import payload_cotizacion
-from app.utils.v1.configs import MODE_API_MOCKUP
+
 
 router = APIRouter(
     tags=["MS Integration Version 2"],
@@ -99,13 +99,6 @@ async def crear_cotizacion(
     body["coll_datos"] = coll_datos
     logger.info(f"{json.dumps(body)}")
 
-    if MODE_API_MOCKUP:
-        response = cotizacion.copy()
-        response["cd_plan_pago"] = cd_plan_pago
-        response["de_plan_pago"] = data["poliza"]["frecuencia_cuota"].value.capitalize()
-        response["bienes"][0]["de_bien"] = fullname
-        response["nu_total_cuota"] = NU_TOTAL_CUOTAS[data["poliza"]["frecuencia_cuota"].value]
-        return response
 
     try:
 
