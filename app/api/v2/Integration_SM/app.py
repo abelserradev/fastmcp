@@ -149,6 +149,11 @@ async def get_cuadro_poliza(
     request: SolicitudCuadroPolizaBase,
     api_key: str = Security(api_key_verifier),
 ):
+    """
+    Args:
+        request: An instance of `SolicitudCuadroPolizaBase` containing the input data needed to generate the policy frame PDF.
+        api_key: A string used for API key verification via security dependency.
+    """
     data = request.model_dump(exclude_unset=True)
     body = payload_cuadro_poliza.copy()
     logger.info(f"data: {data}")
