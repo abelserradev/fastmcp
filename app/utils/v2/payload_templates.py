@@ -14,7 +14,7 @@ payload_cotizacion = {
             {
                 "cd_dato": "710055", # Cliente tarifa *configuracion*
                 "nu_bien": "1",
-                "valor": "0"
+                "valor": "19"
             },
             {
                 "cd_dato": "710001", # País de residencia. 29 Venezuela
@@ -24,7 +24,7 @@ payload_cotizacion = {
             {
                 "cd_dato": "710038", # Plan Global Benefits *configuracion*
                 "nu_bien": "1",
-                "valor": "15"
+                "valor": "1"
             },
             {
                 "cd_dato": "710034", # Deducible en Venezuela *fijo en 0*
@@ -70,6 +70,51 @@ payload_cotizacion = {
                 "cd_dato": "710032", # Factpr de Ajuste comision *valor fijo 10 configuracion*
                 "nu_bien": "1",
                 "valor": "10"
+            },
+            {
+                "cd_dato": "710200", # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710201", # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710202", # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710203",    # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710204", #Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710205",    # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710206",  # Dato interno sirweb valor fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710207", # Dato interno sirweb fijo en 0
+                "nu_bien": "1",
+                "valor": "0"
+            },
+            {
+                "cd_dato": "710216", # Activación de cobertura de cuida salud fijo en 1
+                "nu_bien": "1",
+                "valor": "1"
             },
             {
                 "cd_dato": "710089", # Deducible exterior de maternidad * valor fijo 0*
