@@ -100,11 +100,13 @@ async def consultar_persona(
         # Verifica el código de estado de la respuesta y retorna los datos correspondientes
         if response.status_code == 200:
             return response_json["persona"]
-        if response.status_code == 400:
-            message = response_json.get("mensajes", "Error en la solicitud")[0][
-                "mensaje"
-            ]
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
+        # if response.status_code == 400:
+        #     message = response_json.get("mensajes", "Error en la solicitud")[0][
+        #         "mensaje"
+        #     ]
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
 
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
@@ -190,8 +192,10 @@ async def crear_persona(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return response_json["persona"][0]
+        else:
+            raise HTTPException(status_code=response.status_code,
+                                detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}")
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -286,8 +290,9 @@ async def crear_cotizacion(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return response_json["cotizacion"]
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -406,8 +411,9 @@ async def consultar_poliza(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return {"polizas": response_json}
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -478,8 +484,9 @@ async def incluir_anexo(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return {"anexo": response_json["anexo"]}
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -542,8 +549,9 @@ async def consultar_recibos(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return {"polizas": polizas}
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
