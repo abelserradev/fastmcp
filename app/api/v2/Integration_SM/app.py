@@ -13,7 +13,7 @@ from fastapi.responses import (
 
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase,  SolicitudCuadroPolizaBase
-from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
+from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse, CuadroPolizaResponse
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
@@ -142,7 +142,8 @@ async def crear_cotizacion(
 
 @router.post(
     "/cuadro_poliza",
-    response_class=FileResponse,
+    #response_class=FileResponse,
+    response_model=CuadroPolizaResponse,
     status_code=status.HTTP_200_OK,
     summary="Devuelve pdf con el cuadro de póliza",
 )
@@ -173,11 +174,18 @@ async def get_cuadro_poliza(
         reporte_codificado = response_json["reporte_codificado"]
 
         # Decodificar base64 a PDF
-        pdf_content = base64.b64decode(reporte_codificado)
-        pdf_stream = BytesIO(pdf_content)
 
+        #pdf_stream = BytesIO(base64.b64decode(reporte_codificado))
+        #pdf_stream = BytesIO(reporte_codificado)
         if response.status_code == 200 and response_json["status"]["code"] == "EXITO":
-            return StreamingResponse(pdf_stream, media_type="application/pdf")
+            return {
+                "status": {
+                    "code": "EXITO",
+                    "descripcion": "EXITO"
+                },
+                "reporte_codificado": reporte_codificado
+            }
+            #return StreamingResponse(reporte_codificado, media_type="application/pdf")
         else:
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
