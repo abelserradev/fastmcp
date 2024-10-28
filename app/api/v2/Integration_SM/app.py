@@ -149,7 +149,7 @@ async def crear_cotizacion(
 )
 async def get_cuadro_poliza(
     request: SolicitudCuadroPolizaBase,
-    #api_key: str = Security(api_key_verifier),
+    api_key: str = Security(api_key_verifier),
 ):
     """
     Args:
