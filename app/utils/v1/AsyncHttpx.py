@@ -25,5 +25,5 @@ async def fetch_url(method: str, url: str, headers: dict = None, payload: dict =
         else:
             raise ValueError("Unsupported HTTP method")
 
-        response.raise_for_status()  # Raise an exception for 4xx and 5xx statuses
+        #response.raise_for_status()  # Raise an exception for 4xx and 5xx statuses
         return response
