@@ -69,3 +69,12 @@ class CotizacionResponse(BaseModel):
     cd_agente_bancario: str
     nm_agente_bancario: str
     bienes: List[BienesResponse]
+
+
+class StatusResponseCuadroPoliza(BaseModel):
+    code: str
+    descripcion: str
+
+class CuadroPolizaResponse(BaseModel):
+    status: StatusResponseCuadroPoliza
+    reporte_codificado: str
