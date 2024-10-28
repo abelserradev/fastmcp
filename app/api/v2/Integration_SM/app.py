@@ -121,8 +121,9 @@ async def crear_cotizacion(
         # verificar si el request fue exitoso
         if response.status_code == 200:
             return response_json["cotizacion"]
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -177,8 +178,9 @@ async def get_cuadro_poliza(
 
         if response.status_code == 200 and response_json["status"]["code"] == "EXITO":
             return StreamingResponse(pdf_stream, media_type="application/pdf")
+        else:
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=response_json)
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
