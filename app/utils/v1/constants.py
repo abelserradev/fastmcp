@@ -1,4 +1,4 @@
-from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY
+from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY, ENV
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
 
@@ -12,7 +12,10 @@ url_emitir_poliza = f"{SM_ENDPOINT}/emitirpoliza"
 url_consultar_poliza = f"{SM_ENDPOINT}/consultarpoliza"
 url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
 url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
-url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/ve/pru/executeRep"
+if ENV in ["production"]:
+    url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/executeRep"
+else:
+    url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/ve/pru/executeRep"
 
 headers = {
     "Ocp-Apim-Subscription-Key": SUBSCRIPTION_KEY,
