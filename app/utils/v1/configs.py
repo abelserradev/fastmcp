@@ -1,7 +1,8 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
-from app.utils.LoggerSingleton import logger
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.utils.v1.LoggerSingleton import logger
 
 
 # Define a Settings class that inherits from BaseSettings
@@ -14,7 +15,9 @@ class Settings(BaseSettings):
     USER: str
     APPLICATION: str
     SUBSCRIPTION_KEY: str
-
+    ENV: str
+    ALLOWED_HOST: str
+    SUMA_ASEGURADA: int
     # Load the settings from the .env file
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -22,9 +25,9 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     """
-        This function returns an instance of the Settings class.
-        It uses the lru_cache decorator to cache the result,
-        so that subsequent calls do not have to re-instantiate the Settings class.
+    This function returns an instance of the Settings class.
+    It uses the lru_cache decorator to cache the result,
+    so that subsequent calls do not have to re-instantiate the Settings class.
     """
     return Settings()
 
@@ -40,5 +43,8 @@ SM_ENDPOINT = settings.SM_ENDPOINT
 USER = settings.USER
 APPLICATION = settings.APPLICATION
 SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
+ENV = settings.ENV
+ALLOWED_HOST = settings.ALLOWED_HOST
+SUMA_ASEGURADA = settings.SUMA_ASEGURADA
 # Log that the settings have been loaded
 logger.info("Settings loaded")

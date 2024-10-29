@@ -44,6 +44,7 @@ COPY .env /app/
 COPY app/api /app/app/api
 COPY app/middlewares /app/app/middlewares
 COPY app/utils /app/app/utils
+COPY app/schemas /app/app/schemas
 
 
 ENV PYTHONPATH=/app
@@ -53,4 +54,3 @@ USER app
 
 ENTRYPOINT ["python", "run.py"]
 EXPOSE 9000
-

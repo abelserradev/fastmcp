@@ -1,9 +1,13 @@
 import uvicorn
-from app.utils.LoggerSingleton import logger
 
+from app.utils.v1.LoggerSingleton import logger
+from app.utils.v1.configs import ENV
 
 def main():
-    uvicorn.run("app.api.app:app", host="0.0.0.0", port=9000, reload=True, workers=4)
+    if ENV in ["production", "staging"]:
+        uvicorn.run("app.api.app:app", host="0.0.0.0", port=9000, reload=False, workers=4)
+    else:
+        uvicorn.run("app.api.app:app", host="0.0.0.0", port=9000, reload=True)
 
 
 if __name__ == "__main__":
@@ -11,4 +15,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         logger.info("Server stopped")
-
