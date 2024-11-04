@@ -150,7 +150,7 @@ async def crear_persona(
     )
     tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
 
-    fe_nacimiento = data["persona"]["fe_nacimiento"].strftime("%d/%m/%Y")
+    fe_nacimiento = data["persona"]["fe_nacimiento"]
     fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
     body["persona"][0]["nm_primer_nombre"] = data["persona"]["nm_primer_nombre"]
     body["persona"][0]["nm_primer_apellido"] = data["persona"]["nm_primer_apellido"]
@@ -233,7 +233,7 @@ async def crear_cotizacion(
 
     data = request.dict(exclude_unset=True)
     logger.info(f"data: {data}")
-    fecha_nacimiento = data["persona"]["fecha_nacimiento"].strftime("%d-%m-%Y")
+    fecha_nacimiento = data["persona"]["fecha_nacimiento"]
     suma_poliza = (
         data["poliza"]["suma_asegurada"]
         if "suma_asegurada" in data["poliza"].keys()
