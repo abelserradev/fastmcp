@@ -105,38 +105,38 @@ async def crear_cotizacion(
     logger.info(f"{json.dumps(body)}")
 
 
-    # try:
+    try:
 
-    response = await fetch_url(
-        "POST",
-        url_cotizar,
-        headers,
-        body
-    )
-    logger.info(f"Response status code: {response.status_code}")
-    # convertir response to JSON
-    response_json = response.json()
-    logger.info(f"Response: {response_json}")
+        response = await fetch_url(
+            "POST",
+            url_cotizar,
+            headers,
+            body
+        )
+        logger.info(f"Response status code: {response.status_code}")
+        # convertir response to JSON
+        response_json = response.json()
+        logger.info(f"Response: {response_json}")
 
-    # verificar si el request fue exitoso
-    if response.status_code == 200:
-        return response_json["cotizacion"]
-    else:
-        logger.error(f"{response_json}")
-        raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
+        # verificar si el request fue exitoso
+        if response.status_code == 200:
+            return response_json["cotizacion"]
+        else:
+            logger.error(f"{response_json}")
+            raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
-    # except httpx.RequestError as e:
-    #     logger.error(f"Error en la solicitud: {e}")
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="Error interno del servidor",
-    #     )
-    # except httpx.ReadTimeout as e:
-    #     logger.error(f"Tiempo de espera excedido: {e}")
-    #     raise HTTPException(
-    #         status_code=status.HTTP_408_REQUEST_TIMEOUT,
-    #         detail="Tiempo de espera excedido",
-    #     )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
 
 
 
