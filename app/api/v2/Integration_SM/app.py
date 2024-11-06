@@ -122,6 +122,7 @@ async def crear_cotizacion(
         if response.status_code == 200:
             return response_json["cotizacion"]
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:
@@ -187,6 +188,7 @@ async def get_cuadro_poliza(
             }
             #return StreamingResponse(reporte_codificado, media_type="application/pdf")
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:

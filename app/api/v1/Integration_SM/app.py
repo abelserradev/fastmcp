@@ -44,7 +44,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 )
 async def consultar_persona(
     request: ConsultarPersonaBase,
-    client: httpx.AsyncClient = Depends(get_client),
+    #client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ) -> dict:
     """
@@ -101,6 +101,7 @@ async def consultar_persona(
         if response.status_code == 200:
             return response_json["persona"]
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
         # if response.status_code == 400:
         #     message = response_json.get("mensajes", "Error en la solicitud")[0][
@@ -149,7 +150,7 @@ async def crear_persona(
     )
     tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
 
-    fe_nacimiento = data["persona"]["fe_nacimiento"].strftime("%d/%m/%Y")
+    fe_nacimiento = data["persona"]["fe_nacimiento"]
     fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
     body["persona"][0]["nm_primer_nombre"] = data["persona"]["nm_primer_nombre"]
     body["persona"][0]["nm_primer_apellido"] = data["persona"]["nm_primer_apellido"]
@@ -193,6 +194,7 @@ async def crear_persona(
         if response.status_code == 200:
             return response_json["persona"][0]
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,
                                 detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}")
 
@@ -231,7 +233,7 @@ async def crear_cotizacion(
 
     data = request.dict(exclude_unset=True)
     logger.info(f"data: {data}")
-    fecha_nacimiento = data["persona"]["fecha_nacimiento"].strftime("%d-%m-%Y")
+    fecha_nacimiento = data["persona"]["fecha_nacimiento"]
     suma_poliza = (
         data["poliza"]["suma_asegurada"]
         if "suma_asegurada" in data["poliza"].keys()
@@ -291,6 +293,7 @@ async def crear_cotizacion(
         if response.status_code == 200:
             return response_json["cotizacion"]
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:
@@ -351,6 +354,7 @@ async def emitir_poliza(
         if response.status_code == 200:
             return response_json["emision"]
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
 
@@ -412,6 +416,7 @@ async def consultar_poliza(
         if response.status_code == 200:
             return {"polizas": response_json}
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:
@@ -485,6 +490,7 @@ async def incluir_anexo(
         if response.status_code == 200:
             return {"anexo": response_json["anexo"]}
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:
@@ -550,6 +556,7 @@ async def consultar_recibos(
         if response.status_code == 200:
             return {"polizas": polizas}
         else:
+            logger.error(f"{response_json}")
             raise HTTPException(status_code=response.status_code,detail=f"{response_json['mensajes'][0]['mensaje']} {response_json['status']['descripcion']}" )
 
     except httpx.RequestError as e:

@@ -1,5 +1,5 @@
 import httpx
-from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception_type
+#from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception_type
 
 
 async def get_client():
@@ -11,7 +11,7 @@ async def get_client():
 
 
 
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(3), retry=retry_if_exception_type(httpx.RequestError))
+#@retry(wait=wait_fixed(2), stop=stop_after_attempt(3), retry=retry_if_exception_type(httpx.RequestError))
 async def fetch_url(method: str, url: str, headers: dict = None, payload: dict = None):
     async with httpx.AsyncClient() as client:
         if method.upper() == 'GET':

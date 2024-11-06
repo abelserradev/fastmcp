@@ -18,8 +18,8 @@ def configure_middleware(app):
 
     # app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
     # Los middlewares personalizados
-    app.add_middleware(middlewares.ErrorHandlingMiddleware)
-    app.add_middleware(middlewares.LoggingMiddleware)
+    #app.add_middleware(middlewares.ErrorHandlingMiddleware)
+    #app.add_middleware(middlewares.LoggingMiddleware)
     app.add_middleware(middlewares.ProcessTimeHeaderMiddleware)
     # if ENV in ["production", "staging"]:
         # app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOST)
