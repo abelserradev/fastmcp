@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, validator, field_validator
 
 
 class TipoDocumento(Enum):
@@ -95,9 +95,34 @@ class PersonaBase(BaseModel):
     nm_primer_apellido: str
     nm_segundo_apellido: str | None = Field(default=None)
     cd_sexo: Sexo
-    fe_nacimiento: str
+    fe_nacimiento: Union[datetime, str]  # Aceptar tanto datetime como str para mayor flexibilidad
     documento: DocumentoBase
     contacto: ContactoBase
+
+    @field_validator("fe_nacimiento")
+    def validate_fecha_nacimiento(cls, v):
+        """
+        Args:
+            v: The value to be validated and possibly converted.
+
+        Returns:
+            The date object parsed from the input value.
+
+        Raises:
+            ValueError: If the input value is a string that cannot be parsed to a date in the format dd/mm/yyyy, or if the input is neither a datetime object nor a properly formatted string.
+        """
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(
+                    v, "%d/%m/%Y"
+                ).date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError("fe_nacimiento debe estar en el formato dd/mm/yyyy")
+        raise ValueError(
+            "fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy"
+        )
 
 
 
@@ -122,7 +147,7 @@ class CrearPersonaBase(BaseModel):
         datetime, str
     ]  # Aceptar tanto datetime como str para mayor flexibilidad
 
-    @validator("fe_registro", pre=True)
+    @field_validator("fe_registro")
     def validate_fecha_registro(cls, v):
         """
         Args:
@@ -181,11 +206,61 @@ class PolizaBase(BaseModel):
         validate_fe_hasta(cls, v):
             Validates and converts the "fe_hasta" attribute to a date object if it's a valid datetime or str in %d/%m/%Y format.
     """
-    fe_desde: str
-    fe_hasta: str
+    fe_desde: Union[datetime, str]  # Aceptar tanto datetime como str
+    fe_hasta: Union[datetime, str]  # Aceptar tanto datetime como str
     frecuencia_cuota: FrecuenciaCuota
     suma_asegurada: Optional[int] = 250
 
+    @field_validator("fe_desde")
+    def validate_fe_desde(cls, v):
+        """
+        Args:
+            v: The value to be validated and converted. It can be a datetime object or a string in the format dd/mm/yyyy.
+
+        Returns:
+            date: The extracted date from a datetime object or the parsed date from a string.
+
+        Raises:
+            ValueError: If the provided value is not a datetime object or a properly formatted string.
+        """
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(
+                    v, "%d/%m/%Y"
+                ).date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError("fe_nacimiento debe estar en el formato dd/mm/yyyy")
+        raise ValueError(
+            "fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy"
+        )
+
+    @field_validator("fe_hasta")
+    def validate_fe_hasta(cls, v):
+        """
+        Args:
+            v: The input value that needs to be validated. It can either be a datetime object or a string in the format dd/mm/yyyy.
+
+        Returns:
+            A date object if the input is valid.
+
+        Raises:
+            ValueError: If the input is a string and cannot be parsed as a date in the format dd/mm/yyyy.
+            ValueError: If the input is neither a datetime object nor a string formatted as dd/mm/yyyy.
+        """
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(
+                    v, "%d/%m/%Y"
+                ).date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError("fe_nacimiento debe estar en el formato dd/mm/yyyy")
+        raise ValueError(
+            "fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy"
+        )
 
 
 
@@ -200,7 +275,32 @@ class PersonaPolizaBase(BaseModel):
     nm_primer_nombre: str
     nm_primer_apellido: str
     documento: DocumentoBase
-    fecha_nacimiento: str
+    fecha_nacimiento: Union[datetime, str]  # Aceptar tanto datetime como str para
+
+    @field_validator("fecha_nacimiento")
+    def validate_fecha_nacimiento(cls, v):
+        """
+        Args:
+            v: The input value to validate. It can be a datetime object or a string representing a date in the format "dd/mm/yyyy".
+
+        Returns:
+            A date object converted from the input datetime or parsed from the input string.
+
+        Raises:
+            ValueError: If the input string cannot be parsed to a date or if the input is neither a datetime object nor a correctly formatted string.
+        """
+        if isinstance(v, datetime):
+            return v.date()  # Si es datetime, convertir a date
+        elif isinstance(v, str):
+            try:
+                return datetime.strptime(
+                    v, "%d/%m/%Y"
+                ).date()  # Intentar parsear el str a date
+            except ValueError:
+                raise ValueError("fe_nacimiento debe estar en el formato dd/mm/yyyy")
+        raise ValueError(
+            "fe_nacimiento debe ser un objeto datetime o una cadena en el formato dd/mm/yyyy"
+        )
 
 
 class CrearPolizaBase(BaseModel):

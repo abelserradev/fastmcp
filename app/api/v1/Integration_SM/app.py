@@ -65,7 +65,7 @@ async def consultar_persona(
               o el mensaje de error correspondiente.
     """
     # Extrae el número de documento de la solicitud y determina el tipo de documento
-    num_document = request.dict(exclude_unset=True)["num_documento"]
+    num_document = request.model_dump(exclude_unset=True)["num_documento"]
 
     # Determina el tipo de documento y ajusta el número de documento si es necesario
     tp_document = tipo_documento[num_document[0]]
@@ -140,7 +140,7 @@ async def crear_persona(
         client: An asynchronous HTTP client dependency for making external API requests.
         api_key: Security dependency for verifying the API key.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
     body = payload_persona.copy()
     nu_documento = (
@@ -150,7 +150,7 @@ async def crear_persona(
     )
     tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
 
-    fe_nacimiento = data["persona"]["fe_nacimiento"]
+    fe_nacimiento = data["persona"]["fe_nacimiento"].strftime("%d/%m/%Y")
     fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
     body["persona"][0]["nm_primer_nombre"] = data["persona"]["nm_primer_nombre"]
     body["persona"][0]["nm_primer_apellido"] = data["persona"]["nm_primer_apellido"]
@@ -231,9 +231,9 @@ async def crear_cotizacion(
 
     """
 
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
-    fecha_nacimiento = data["persona"]["fecha_nacimiento"]
+    fecha_nacimiento = fecha_nacimiento = data["persona"]["fecha_nacimiento"].strftime("%d-%m-%Y")
     suma_poliza = (
         data["poliza"]["suma_asegurada"]
         if "suma_asegurada" in data["poliza"].keys()
@@ -327,7 +327,7 @@ async def emitir_poliza(
         client: Cliente HTTP asincrónico utilizado para hacer solicitudes.
         api_key: Clave de API utilizada para la verificación de seguridad.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
     logger.info(f"headers: {headers}")
     logger.info(f"url_emitir_poliza: {url_emitir_poliza}")
@@ -389,7 +389,7 @@ async def consultar_poliza(
         client: An asynchronous HTTP client dependency, provided by FastAPI's Depends function.
         api_key: A security dependency to verify the API key, provided by FastAPI's Security function.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     body = payload_consultar_poliza.copy()
     body["polizas-recibos"][0]["cd_entidad"] = data["cd_entidad"]
     body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
@@ -450,7 +450,7 @@ async def incluir_anexo(
         client: An httpx.AsyncClient instance for making HTTP requests.
         api_key: A string representing the security API key.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     name = f"{data['nm_primer_nombre']} {data['nm_primer_apellido']}"
     body = payload_inclusion_anexos_poliza.copy()
     body["cd_entidad"] = data["cd_entidad"]
@@ -530,7 +530,7 @@ async def consultar_recibos(
     Raises:
         HTTPException: If the response status code is not 200 or if there is any request error or timeout.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     body = payload_consultar_poliza.copy()
     body["polizas-recibos"][0]["cd_entidad"] = data["cd_entidad"]
     body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
