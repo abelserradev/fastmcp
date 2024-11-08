@@ -34,7 +34,10 @@ headers = {
     status_code=status.HTTP_200_OK,
     summary="Prueba Zoho",
 )
-async def webhook_insurances(request: PayloadRequest):
+async def webhook_insurances(
+        request: PayloadRequest,
+        api_key: str = Security(api_key_verifier),
+):
     payload = request.model_dump()["payload"]
     logger.info(f"Payload: {payload}")
 
