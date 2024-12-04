@@ -121,7 +121,12 @@ async def consultar_persona(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 @router.post(
     "/crear_persona",
@@ -210,7 +215,12 @@ async def crear_persona(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 @router.post(
     "/crear_cotizacion",
@@ -308,7 +318,12 @@ async def crear_cotizacion(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 @router.post(
     "/emitir_poliza",
@@ -370,7 +385,12 @@ async def emitir_poliza(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 # response_model=PolizasConsultaResponse,
 @router.post(
@@ -431,7 +451,12 @@ async def consultar_poliza(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 @router.post(
     "/incluir_anexo",
@@ -505,7 +530,12 @@ async def incluir_anexo(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 @router.post(
     "/consultar_recibos",
@@ -570,4 +600,10 @@ async def consultar_recibos(
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
+        )
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
         )

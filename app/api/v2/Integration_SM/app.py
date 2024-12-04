@@ -12,7 +12,8 @@ from fastapi.responses import (
 )
 
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase,  SolicitudCuadroPolizaBase
+from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase, SolicitudCuadroPolizaBase, \
+    ConsultarCotizacionBase
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse, CuadroPolizaResponse
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
@@ -22,12 +23,14 @@ from app.utils.v1.constants import (
     headers,
     tipo_documento,
     url_cotizar,
-    NU_TOTAL_CUOTAS, url_cuadro_poliza
+    NU_TOTAL_CUOTAS,
+    url_cuadro_poliza,
+    url_consultar_cotizacion
 )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.mockup_response_cotizacion import cotizacion
 
-from app.utils.v2.payload_templates import payload_cotizacion, payload_cuadro_poliza
+from app.utils.v2.payload_templates import payload_cotizacion, payload_cuadro_poliza, payload_consultar_cotizacion
 
 router = APIRouter(
     tags=["MS Integration Version 2"],
@@ -137,7 +140,12 @@ async def crear_cotizacion(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
         )
-
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 
 
@@ -202,4 +210,101 @@ async def get_cuadro_poliza(
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail="Tiempo de espera excedido",
+        )
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
+
+@router.post(
+    "/consultar_cotizacion",
+    status_code=status.HTTP_200_OK,
+    summary="Consultar cotizacion de persona en Seguros Mercantil",
+)
+async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = Security(api_key_verifier)):
+    data = request.model_dump(exclude_unset=True)
+    cd_entidad = data.get("cd_entidad")
+    body = payload_consultar_cotizacion.copy()
+    body["nu_cotizacion"] = data.get("nu_cotizacion")
+    body["cd_entidad"] = cd_entidad
+
+    try:
+        response = await fetch_url(
+            "POST",
+            url_consultar_cotizacion,
+            headers,
+            body
+        )
+        logger.info(f"Response status code: {response.status_code}")
+        response_json = response.json()
+
+        message_error = "No se encontro cotizacion que cumpliera con los criterios indicados. "
+        if response.status_code == 200 and len(response_json["mensajes"]) > 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=response_json["mensajes"][0]["mensaje"],
+            )
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Error: {response_json}"
+            )
+
+
+        cotizacion = response_json["cotizacion"][0]
+        bienes = []
+        for bien in response_json["cotizacion"][0]["bienes"]:
+            temp = bien.copy()
+            del(temp["fe_fallecimiento"],
+                temp["datos"],
+                temp["fe_exclusion"],
+                temp["preguntas"],
+                temp["nu_consec_tp_doc_asegurado"]
+                )
+            bienes.append(temp)
+            logger.info(temp)
+
+        # logger.info(f"Bienes: {json.dumps(bienes)}")
+
+
+        response_data = {
+            "de_plan_pago": cotizacion["de_plan_pago"],
+            "fe_desde": cotizacion["fe_desde"],
+            "fe_hasta": cotizacion["fe_hasta"],
+            "cd_entidad": cotizacion["cd_entidad"],
+            "nu_cotizacion": cotizacion["nu_cotizacion"],
+            "nu_documento_contratante": cotizacion["nu_documento_contratante"],
+            "tp_documento_contratante": cotizacion["tp_documento_contratante"],
+            "nu_documento": cotizacion["nu_documento"],
+            "tp_documento": cotizacion["tp_documento"],
+            "nu_poliza": cotizacion["nu_poliza"],
+            "mt_prima_total": cotizacion["mt_prima_total"],
+            "cd_region": cotizacion["cd_region"],
+            "nu_total_cuota": cotizacion["nu_total_cuota"],
+            "cd_area": cotizacion["cd_area"],
+            "nm_cliente": cotizacion["nm_cliente"],
+            "de_st_cotizacion": cotizacion["de_st_cotizacion"],
+            "bienes": bienes
+        }
+        return response_data
+
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
         )
