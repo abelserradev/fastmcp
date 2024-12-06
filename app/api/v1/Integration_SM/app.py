@@ -19,7 +19,7 @@ from app.utils.v1.AsyncHttpx import get_client, fetch_url
 from app.utils.v1.configs import API_KEY_AUTH
 from app.utils.v1.constants import (frecuencia_cuota, headers, tipo_documento,
                                     url_consult_persona, url_consultar_poliza,
-                                    url_crear_persona, url_crear_poliza,
+                                    url_crear_persona, url_crear_cotizacion,
                                     url_emitir_poliza,
                                     url_inclusion_anexos_poliza)
 from app.utils.v1.LoggerSingleton import logger
@@ -308,7 +308,7 @@ async def crear_cotizacion(
 
         response = await fetch_url(
             "POST",
-            url_crear_poliza,
+            url_crear_cotizacion,
             headers,
             body
         )
@@ -386,7 +386,7 @@ async def emitir_poliza(
 
         response = await fetch_url(
             "POST",
-            url_crear_poliza,
+            url_emitir_poliza,
             headers,
             body
         )
