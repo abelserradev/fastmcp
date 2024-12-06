@@ -105,11 +105,7 @@ async def consultar_persona(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{e}",
         )
-    except Exception as e:
-        logger.error(f"{e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+
 
     if response.status_code != 200:
         logger.error(f"{response.json()}")
@@ -125,8 +121,10 @@ async def consultar_persona(
     # Convierte la respuesta en JSON
     response_json = response.json()
     logger.info(f"Response: {response_json}")
+    persona = response_json.get("persona", [])
 
-    return response_json["persona"]
+
+    return persona
 
 
 
