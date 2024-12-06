@@ -12,10 +12,13 @@ from fastapi.responses import (
 )
 
 from app.middlewares.verify_api_key import APIKeyVerifier
+from app.schemas.v1.Integration_SM.ModelAPI import EmitirPolizaBase
+from app.schemas.v1.Integration_SM.ResponseModelAPI import EmisionResponse
 from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase, SolicitudCuadroPolizaBase, \
     ConsultarCotizacionBase
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse, CuadroPolizaResponse
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
+from app.utils.v2.SyncHttpx import get_sync_client, sync_fetch_url
 
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
 from app.utils.v1.constants import (
@@ -25,9 +28,10 @@ from app.utils.v1.constants import (
     url_cotizar,
     NU_TOTAL_CUOTAS,
     url_cuadro_poliza,
-    url_consultar_cotizacion
+    url_consultar_cotizacion, url_emitir_poliza
 )
 from app.utils.v1.LoggerSingleton import logger
+from app.utils.v1.payload_templates import payload_emitir_poliza
 from app.utils.v2.mockup_response_cotizacion import cotizacion
 
 from app.utils.v2.payload_templates import payload_cotizacion, payload_cuadro_poliza, payload_consultar_cotizacion
@@ -346,3 +350,81 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
     }
     logger.info(f"Response: {response_data}")
     return response_data
+
+
+
+@router.post(
+    "/emitir_poliza",
+    response_model=EmisionResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Emitir poliza de persona en Seguros Mercantil",
+)
+def emitir_poliza(
+    request: EmitirPolizaBase,
+    client: httpx.Client = Depends(get_sync_client),
+    api_key: str = Security(api_key_verifier),
+) -> dict:
+    """
+    Args:
+        request: Contiene los datos de la solicitud para emitir la póliza.
+        client: Cliente HTTP sincrónico utilizado para hacer solicitudes.
+        api_key: Clave de API utilizada para la verificación de seguridad.
+    """
+    try:
+        data = request.model_dump(exclude_unset=True)
+        logger.info(f"data: {data}")
+        body = payload_emitir_poliza.copy()
+        body["coll_generales"]["generales"][0]["cd_entidad"] = data["cd_entidad"]
+        body["coll_generales"]["generales"][0]["nu_cotizacion"] = data["nu_cotizacion"]
+
+    except Exception as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
+
+    try:
+
+        response = sync_fetch_url(
+            "POST",
+            url_emitir_poliza,
+            headers,
+            body
+        )
+
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{e}",
+        )
+
+    if response.status_code != 200:
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+    if response.json()["status"]["code"] != "EXITO":
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+
+    response_json = response.json()
+    logger.info(f"Response: {response_json}")
+
+
+    return response_json["emision"]
