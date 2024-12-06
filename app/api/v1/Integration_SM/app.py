@@ -156,13 +156,13 @@ async def crear_persona(
         )
         tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
 
-        fe_nacimiento = data["persona"]["fe_nacimiento"]
-        fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
+        #fe_nacimiento = data["persona"]["fe_nacimiento"]
+        #fe_registro = data["fe_registro"].strftime("%d/%m/%Y")
         body["persona"][0]["nm_primer_nombre"] = data["persona"]["nm_primer_nombre"]
         body["persona"][0]["nm_primer_apellido"] = data["persona"]["nm_primer_apellido"]
         body["persona"][0]["cd_sexo"] = data["persona"]["cd_sexo"].value
-        body["persona"][0]["fe_nacimiento"] = fe_nacimiento
-        body["persona"][0]["fe_registro"] = fe_registro
+        body["persona"][0]["fe_nacimiento"] = data["persona"]["fe_nacimiento"]
+        body["persona"][0]["fe_registro"] = data["fe_registro"]
         body["persona"][0]["persona_email"][0]["de_email"] = data["persona"]["contacto"][
             "de_email"
         ]
