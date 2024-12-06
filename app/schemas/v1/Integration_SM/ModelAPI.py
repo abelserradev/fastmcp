@@ -115,9 +115,10 @@ class PersonaBase(BaseModel):
             return v.date()  # Si es datetime, convertir a date
         elif isinstance(v, str):
             try:
-                return datetime.strptime(
+                date_formated = datetime.strptime(
                     v, "%d/%m/%Y"
                 ).date()  # Intentar parsear el str a date
+                return date_formated.strftime("%d/%m/%Y")
             except ValueError:
                 raise ValueError("fe_nacimiento debe estar en el formato dd/mm/yyyy")
         raise ValueError(
@@ -143,9 +144,7 @@ class CrearPersonaBase(BaseModel):
     """
     persona: PersonaBase
 
-    fe_registro: Union[
-        datetime, str
-    ]  # Aceptar tanto datetime como str para mayor flexibilidad
+    fe_registro: str # Aceptar tanto datetime como str para mayor flexibilidad
 
     @field_validator("fe_registro")
     def validate_fecha_registro(cls, v):
@@ -163,9 +162,10 @@ class CrearPersonaBase(BaseModel):
             return v.date()  # Si es datetime, convertir a date
         elif isinstance(v, str):
             try:
-                return datetime.strptime(
+                date_formated = datetime.strptime(
                     v, "%d/%m/%Y"
                 ).date()  # Intentar parsear el str a date
+                return date_formated.strftime("%d/%m/%Y")
             except ValueError:
                 raise ValueError("fe_registro debe estar en el formato dd/mm/yyyy")
         raise ValueError(
