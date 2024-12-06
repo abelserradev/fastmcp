@@ -7,7 +7,7 @@ frecuencia_cuota = {"MENSUAL": 201, "TRIMESTRAL": 202, "SEMESTRAL": 203, "ANUAL"
 
 url_consult_persona = f"{SM_ENDPOINT}/consultarpersona"
 url_crear_persona = f"{SM_ENDPOINT}/crearpersona"
-url_crear_poliza = f"{SM_ENDPOINT}/cotizaraccpersonales"
+url_crear_cotizacion = f"{SM_ENDPOINT}/cotizaraccpersonales"
 url_emitir_poliza = f"{SM_ENDPOINT}/emitirpoliza"
 url_consultar_poliza = f"{SM_ENDPOINT}/consultarpoliza"
 url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
