@@ -508,7 +508,7 @@ async def consultar_poliza(
 
     response_json = response.json()
     logger.info(f"Response: {response_json}")
-    return {"polizas": response_json}
+    return response_json
 
 
 
