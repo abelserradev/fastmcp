@@ -1,6 +1,6 @@
 
 services:
-  integration_sm_api:
+  integration_sm_api_staging:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,15 +8,15 @@ services:
       - .env
     environment:
       - TZ=America/Caracas
-    container_name: integration_sm_api
+    container_name: integration_sm_api_staging
     ports:
       - "9050:9000"
     networks:
-      - integration_sm_api
+      - integration_sm_api_staging
     restart: always
 
 
 
 networks:
-  integration_sm_api:
+  integration_sm_api_staging:
     driver: bridge
