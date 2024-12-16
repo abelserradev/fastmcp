@@ -192,3 +192,26 @@ payload_cuadro_poliza = {
         "nu_endoso": 0
     }
 }
+
+payload_consultar_cotizacion = {
+    "aplicacion": APPLICATION,
+    "funcionalidad": "CONSULTAR_COTIZACION_V",
+    "usuario": USER,
+    "cd_entidad": 0,
+    "nu_cotizacion": 0,
+    "cd_persona": "",
+    "tp_documento": "",
+    "nu_documento": "",
+    "cd_persona_mediador": "",
+    "cd_persona_mediador_especial": "",
+    "cd_mediador": "",
+    "cd_mediador_especial": "",
+    "nu_secuencia_estructura": "",
+    "cd_agente_bancario": "",
+    "datos_cotizacion": [
+        {
+            "cd_dato": "",
+            "va_dato": ""
+        }
+    ]
+}

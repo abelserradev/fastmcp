@@ -102,3 +102,9 @@ class DatosPolizaBase(BaseModel):
 
 class SolicitudCuadroPolizaBase(BaseModel):
     datos_poliza: DatosPolizaBase
+
+
+
+class ConsultarCotizacionBase(BaseModel):
+    nu_cotizacion: int
+    cd_entidad: int
