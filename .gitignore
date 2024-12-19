@@ -480,6 +480,9 @@ fabric.properties
 .idea/
 data/
 .env.prod
+.env.local
+.env.stage
+poetry.lock
 prueba.json
 payload.json
 peticion.json
