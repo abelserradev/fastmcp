@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Security, status
 
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v3.Integracion_SM.ModelRequestBase import CrearPolizaBase
+from app.utils.v1.AsyncHttpx import fetch_url
 #from app.schemas.v3.Integracion_SM.ModelResponseBase import CotizacionResponse
 #from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
@@ -137,7 +138,7 @@ async def crear_cotizacion(
     ),
                 "fe_nacimiento": beneficiario["fe_nacimiento"],
                 "nm_primer_nombre": beneficiario["nm_primer_nombre"],
-                "cd_sexo": beneficiario["cd_sexo"],
+                "cd_sexo": beneficiario["cd_sexo"].value,
                 "tp_documento": tipo_documento[beneficiario["nu_documento"][0]],
                 "in_accion": "I",
                 "nm_primer_apellido": beneficiario["nm_primer_apellido"]
@@ -155,9 +156,45 @@ async def crear_cotizacion(
     payload["coll_bienes"] = {"bienes": [bien]}
     payload["coll_generales"] = {"generales": [general]}
     payload["coll_grpaseg"] = {"grpaseg": grpasegs}
+    try:
+        logger.info(f"Payload-> {json.dumps(payload)}")
+        response = await  fetch_url(
+            "POST",
+            url_cotizar,
+            headers,
+            payload
+        )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{e}",
+        )
 
+    # verificar si el request fue exitoso
+    if response.status_code != 200:
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
 
-    
+    if response.json()["status"]["code"] != "EXITO":
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
 
-    logger.info(f"data: {datos}")
-    return payload
+    # convertir response to JSON
+    response_json = response.json()
+    logger.info(f"Response: {response_json}")
+    return response_json["cotizacion"]
