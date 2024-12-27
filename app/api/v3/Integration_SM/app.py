@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, Security, status
 
 
 from app.middlewares.verify_api_key import APIKeyVerifier
+from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
 from app.schemas.v3.Integracion_SM.ModelRequestBase import CrearPolizaBase
-from app.utils.v1.AsyncHttpx import fetch_url
+from app.utils.v1.AsyncHttpx import fetch_url, get_client
 #from app.schemas.v3.Integracion_SM.ModelResponseBase import CotizacionResponse
 #from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
@@ -32,12 +33,14 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 @router.post(
     "/crear_cotizacion_global",
-    #response_model=CotizacionResponse,
+    response_model=CotizacionResponse,
     status_code=status.HTTP_200_OK,
     summary="Crear cotizacion de persona en Seguros Mercantil",
 )
 async def crear_cotizacion(
-    request: CrearPolizaBase
+        request: CrearPolizaBase,
+        client: httpx.AsyncClient = Depends(get_client),
+        api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
