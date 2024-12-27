@@ -481,8 +481,8 @@ fabric.properties
 data/
 .env.prod
 .env.local
-.env
 .env.stage
+poetry.lock
 prueba.json
 payload.json
 peticion.json
