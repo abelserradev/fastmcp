@@ -463,7 +463,7 @@ async def consultar_poliza(
         )
 
     try:
-
+        logger.info(f"Payload:{body}")
         response = await fetch_url(
             "POST",
             url_consultar_poliza,
