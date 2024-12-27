@@ -65,7 +65,7 @@ async def consultar_persona(
               o el mensaje de error correspondiente.
     """
     # Extrae el número de documento de la solicitud y determina el tipo de documento
-    num_document = request.dict(exclude_unset=True)["num_documento"]
+    num_document = request.model_dump(exclude_unset=True)["num_documento"]
 
     # Determina el tipo de documento y ajusta el número de documento si es necesario
     tp_document = tipo_documento[num_document[0]]
@@ -389,13 +389,14 @@ async def consultar_poliza(
         client: An asynchronous HTTP client dependency, provided by FastAPI's Depends function.
         api_key: A security dependency to verify the API key, provided by FastAPI's Security function.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     body = payload_consultar_poliza.copy()
     body["polizas-recibos"][0]["cd_entidad"] = data["cd_entidad"]
     body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
     body["polizas-recibos"][0]["poliza"] = data["poliza"]
     body["polizas-recibos"][0]["certificado"] = data["certificado"]
-    body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
+    if  "nu_recibo" in data.keys():
+        body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
 
     try:
         # response = await client.post(
