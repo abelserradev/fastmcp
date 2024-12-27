@@ -327,7 +327,7 @@ async def emitir_poliza(
         client: Cliente HTTP asincrónico utilizado para hacer solicitudes.
         api_key: Clave de API utilizada para la verificación de seguridad.
     """
-    data = request.dict(exclude_unset=True)
+    data = request.model_dump(exclude_unset=True)
     logger.info(f"data: {data}")
     logger.info(f"headers: {headers}")
     logger.info(f"url_emitir_poliza: {url_emitir_poliza}")
