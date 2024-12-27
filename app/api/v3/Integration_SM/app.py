@@ -15,7 +15,7 @@ from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
     tipo_documento,
-    url_cotizar
+    url_cotizar, PARENTESCO
 )
 from app.utils.v1.LoggerSingleton import logger
 
@@ -39,8 +39,10 @@ async def crear_cotizacion(
     request: CrearPolizaBase
 ):
     data = request.model_dump(exclude_unset=True)
+    logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
     datos = payload.get("coll_datos").get("datos").copy()
+    generales = payload.get("coll_generales").get("generales")
 
 
     num_hijos = int(data.get("cantidad_hijos"))
@@ -70,40 +72,92 @@ async def crear_cotizacion(
             }
         )
 
-    nombre_titular = f"{data['nm_primer_nombre']} {data['nm_primer_apellido']}"
-    dni_titular = data['documento']['nu_documento'].value
-    sexo_titular = data['sexo'].value
-    fecha_nacimiento_titular = data['fecha_nacimiento']
+    nombre_titular = f"{data['persona']['nm_primer_nombre']} {data['persona']['nm_primer_apellido']}"
+
+    nu_documento = (
+        data["persona"]["documento"]["nu_documento"][2:]
+        if data["persona"]["documento"]["nu_documento"][0] == "P"
+        else data["persona"]["documento"]["nu_documento"]
+    )
+    tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
+
+    sexo_titular = data['persona']['sexo'].value
+    fecha_nacimiento_titular = data['persona']['fecha_nacimiento']
     fe_desde = data['poliza']['fe_desde']
     fe_hasta = data['poliza']['fe_hasta']
-    frecuencia = data['poliza']['frecuencia_cuota'].value
-    # Parentesco titular
-    datos.append(
-        {
-            "cd_dato": "710000",
-            "nu_bien": "1",
-            "valor": "1"
-        },
+    frecuencia = data['poliza']['frecuencia_cuota']
+
+    datos.extend(
+        [
+            {
+                "cd_dato": "710000",
+                "nu_bien": "1",
+                "valor": "1"
+            },
+            {
+                "cd_dato": "710037",  # Fecha nacimiento títular. dd/mm/yyy
+                "nu_bien": "1",
+                "valor": fecha_nacimiento_titular
+            },
+            {
+                "cd_dato": "710036",  # Sexo del títular F/M.
+                "nu_bien": "1",
+                "valor": sexo_titular
+            }
+        ]
     )
-    # Fecha nacimiento titular
-    datos.append(
-        {
-            "cd_dato": "710037",  # Fecha nacimiento títular. dd/mm/yyy
-            "nu_bien": "1",
-            "valor": fecha_nacimiento_titular
-        },
-    )
-    # Sexo titular
-    datos.append(
-        {
-            "cd_dato": "710036",  # Sexo del títular F/M.
-            "nu_bien": "1",
-            "valor":sexo_titular
-        }
-    )
+    bien = {
+        "in_seleccion": "1",
+        "nu_bien": "1",
+        "de_bien": nombre_titular
+    }
+    general = generales[0]
+    cd_plan_pago = frecuencia_cuota[frecuencia.value]
+    general["cd_plan_pago"] = cd_plan_pago
+    general["fe_desde"] = fe_desde
+    general["fe_hasta"] = fe_hasta
+    general["ca_cuota"] = "1"
+    general["nu_documento_contratante"] = nu_documento
+    general["nu_documento"] = nu_documento
+    general["cd_frecuencia_cuota"] = frecuencia.value[0]
+    general["nm_cliente"] = nombre_titular
+    general["tp_documento"] = tp_documento
+    general["tp_documento_contratante"] = tp_documento
+    grpasegs = []
+    for index,beneficiario in enumerate(beneficiarios):
+        grpasegs.append(
+            {
+                "cd_parentesco": PARENTESCO[beneficiario["cd_parentesco"].value],
+                "nu_consecutivo_asegurado": f"{index+1}",
+                "nu_bien": "1",
+                "nu_documento": (
+        beneficiario["nu_documento"][2:]
+        if beneficiario["nu_documento"][0] == "P"
+        else beneficiario["nu_documento"]
+    ),
+                "fe_nacimiento": beneficiario["fe_nacimiento"],
+                "nm_primer_nombre": beneficiario["nm_primer_nombre"],
+                "cd_sexo": beneficiario["cd_sexo"],
+                "tp_documento": tipo_documento[beneficiario["nu_documento"][0]],
+                "in_accion": "I",
+                "nm_primer_apellido": beneficiario["nm_primer_apellido"]
+            }
+        )
 
 
+    # Removed key in a dictionary
+    payload.pop("coll_bienes")
+    payload.pop("coll_datos")
+    payload.pop("coll_generales")
+    payload.pop("coll_grpaseg")
+    logger.info(f"Payload to requests: {payload}")
+    payload["coll_datos"] = {"datos": datos}
+    payload["coll_bienes"] = {"bienes": [bien]}
+    payload["coll_generales"] = {"generales": [general]}
+    payload["coll_grpaseg"] = {"grpaseg": grpasegs}
 
+
+    
 
     logger.info(f"data: {datos}")
-    return {"data": datos}
+    return payload
