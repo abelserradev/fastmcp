@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     ENV: str
     ALLOWED_HOST: str
     SUMA_ASEGURADA: int
+
     # Load the settings from the .env file
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -46,5 +47,6 @@ SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
 ENV = settings.ENV
 ALLOWED_HOST = settings.ALLOWED_HOST
 SUMA_ASEGURADA = settings.SUMA_ASEGURADA
+
 # Log that the settings have been loaded
 logger.info("Settings loaded")
