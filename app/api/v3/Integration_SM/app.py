@@ -51,6 +51,8 @@ async def crear_cotizacion(
 
     num_hijos = int(data.get("cantidad_hijos"))
     tiene_conyugue = data.get("tiene_conyugue")
+    tiene_padre = data.get("tiene_padre")
+    tiene_madre = data.get("tiene_madre")
     beneficiarios = data.get("beneficiarios", [])
 
     if num_hijos > 0:
@@ -73,6 +75,38 @@ async def crear_cotizacion(
                 "cd_dato": "710051",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
                 "nu_bien": "1",
                 "valor": fe_nac_conyugue
+            }
+        )
+
+    if tiene_padre:
+        fe_nac_padre = ""
+        for beneficiario in beneficiarios:
+            parentesco = beneficiario.get("cd_parentesco").value
+            if parentesco == "PADRE":
+                fe_nac_padre = beneficiario["fe_nacimiento"]
+                break
+
+        datos.append(
+            {
+                "cd_dato": "710057",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
+                "nu_bien": "1",
+                "valor": fe_nac_padre
+            }
+        )
+
+    if tiene_madre:
+        fe_nac_madre = ""
+        for beneficiario in beneficiarios:
+            parentesco = beneficiario.get("cd_parentesco").value
+            if parentesco == "MADRE":
+                fe_nac_madre = beneficiario["fe_nacimiento"]
+                break
+
+        datos.append(
+            {
+                "cd_dato": "710060",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
+                "nu_bien": "1",
+                "valor": fe_nac_madre
             }
         )
 
@@ -110,6 +144,7 @@ async def crear_cotizacion(
             }
         ]
     )
+    logger.info(f"Datos: {json.dumps(datos)}")
     bien = {
         "in_seleccion": "1",
         "nu_bien": "1",

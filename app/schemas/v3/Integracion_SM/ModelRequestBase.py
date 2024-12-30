@@ -101,6 +101,8 @@ class CrearPolizaBase(BaseModel):
     poliza: PolizaBase
     tiene_conyugue: bool
     cantidad_hijos: int
+    tiene_padre: bool
+    tiene_madre: bool
     beneficiarios: List[BeneficiariosBase]
 
 
