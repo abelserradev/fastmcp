@@ -99,11 +99,11 @@ class CrearPolizaBase(BaseModel):
     """
     persona: PersonaPolizaBase
     poliza: PolizaBase
-    tiene_conyugue: bool
-    cantidad_hijos: int
-    tiene_padre: bool
-    tiene_madre: bool
-    beneficiarios: List[BeneficiariosBase]
+    tiene_conyugue: Optional[bool] = False
+    cantidad_hijos: Optional[int] = 0
+    tiene_padre: Optional[bool] = False
+    tiene_madre: Optional[bool] = False
+    beneficiarios: Optional[List[BeneficiariosBase]] = []
 
 
 class DatosPolizaBase(BaseModel):

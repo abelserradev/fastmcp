@@ -49,10 +49,10 @@ async def crear_cotizacion(
     generales = payload.get("coll_generales").get("generales")
 
 
-    num_hijos = int(data.get("cantidad_hijos"))
-    tiene_conyugue = data.get("tiene_conyugue")
-    tiene_padre = data.get("tiene_padre")
-    tiene_madre = data.get("tiene_madre")
+    num_hijos = int(data.get("cantidad_hijos",0))
+    tiene_conyugue = data.get("tiene_conyugue", False)
+    tiene_padre = data.get("tiene_padre", False)
+    tiene_madre = data.get("tiene_madre", False)
     beneficiarios = data.get("beneficiarios", [])
 
     if num_hijos > 0:
@@ -163,17 +163,14 @@ async def crear_cotizacion(
     general["tp_documento"] = tp_documento
     general["tp_documento_contratante"] = tp_documento
     grpasegs = []
+
     for index,beneficiario in enumerate(beneficiarios):
         grpasegs.append(
             {
                 "cd_parentesco": PARENTESCO[beneficiario["cd_parentesco"].value],
                 "nu_consecutivo_asegurado": f"{index+1}",
                 "nu_bien": "1",
-                "nu_documento": (
-        beneficiario["nu_documento"][2:]
-        if beneficiario["nu_documento"][0] == "P"
-        else beneficiario["nu_documento"]
-    ),
+                "nu_documento": (beneficiario["nu_documento"][2:] if beneficiario["nu_documento"][0] == "P" else beneficiario["nu_documento"]),
                 "fe_nacimiento": beneficiario["fe_nacimiento"],
                 "nm_primer_nombre": beneficiario["nm_primer_nombre"],
                 "cd_sexo": beneficiario["cd_sexo"].value,
