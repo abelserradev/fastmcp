@@ -452,8 +452,11 @@ async def consultar_poliza(
         body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
         body["polizas-recibos"][0]["poliza"] = data["poliza"]
         body["polizas-recibos"][0]["certificado"] = data["certificado"]
+        if "nu_recibo" not in data.keys():
+            del body["polizas-recibos"][0]["nu_recibo"]
         if "nu_recibo" in data.keys():
             body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
+
 
     except Exception as e:
         logger.error(f"{e}")
