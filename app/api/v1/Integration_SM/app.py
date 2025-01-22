@@ -452,11 +452,15 @@ async def consultar_poliza(
         body["polizas-recibos"][0]["cd_area"] = data["cd_area"]
         body["polizas-recibos"][0]["poliza"] = data["poliza"]
         body["polizas-recibos"][0]["certificado"] = data["certificado"]
-        if "nu_recibo" not in data.keys():
+        logger.info(f"antes: {body}")
+        try:
             del body["polizas-recibos"][0]["nu_recibo"]
+        except KeyError:
+            ...
+
         if "nu_recibo" in data.keys():
             body["polizas-recibos"][0]["nu_recibo"] = data["nu_recibo"]
-
+        logger.info(f"depues: {body}")
 
     except Exception as e:
         logger.error(f"{e}")
