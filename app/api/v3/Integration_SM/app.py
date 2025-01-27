@@ -165,6 +165,7 @@ async def crear_cotizacion(
     grpasegs = []
 
     for index,beneficiario in enumerate(beneficiarios):
+
         grpasegs.append(
             {
                 "cd_parentesco": PARENTESCO[beneficiario["cd_parentesco"].value],

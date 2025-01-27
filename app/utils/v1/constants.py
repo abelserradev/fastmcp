@@ -36,7 +36,7 @@ CORS_CONFIG = {
 }
 
 PARENTESCO = {
-    "CONYUGUE": 2,
+    "CONYUGE": 2,
     "HIJO": 3,
     "PADRE": 6,
     "MADRE": 7,
