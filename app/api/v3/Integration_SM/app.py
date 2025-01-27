@@ -50,7 +50,7 @@ async def crear_cotizacion(
 
 
     num_hijos = int(data.get("cantidad_hijos",0))
-    tiene_conyugue = data.get("tiene_conyugue", False)
+    tiene_conyuge = data.get("tiene_conyuge", False)
     tiene_padre = data.get("tiene_padre", False)
     tiene_madre = data.get("tiene_madre", False)
     beneficiarios = data.get("beneficiarios", [])
@@ -62,19 +62,19 @@ async def crear_cotizacion(
             "valor": f"{num_hijos}"
         })
     #
-    if tiene_conyugue:
-        fe_nac_conyugue = ""
+    if tiene_conyuge:
+        fe_nac_conyuge = ""
         for beneficiario in beneficiarios:
             parentesco = beneficiario.get("cd_parentesco").value
-            if parentesco == "CONYUGUE":
-                fe_nac_conyugue = beneficiario["fe_nacimiento"]
+            if parentesco == "CONYUGE":
+                fe_nac_conyuge = beneficiario["fe_nacimiento"]
                 break
 
         datos.append(
             {
-                "cd_dato": "710051",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
+                "cd_dato": "710051",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyuge vinculado.
                 "nu_bien": "1",
-                "valor": fe_nac_conyugue
+                "valor": fe_nac_conyuge
             }
         )
 
@@ -88,7 +88,7 @@ async def crear_cotizacion(
 
         datos.append(
             {
-                "cd_dato": "710057",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
+                "cd_dato": "710057",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyuge vinculado.
                 "nu_bien": "1",
                 "valor": fe_nac_padre
             }
@@ -104,7 +104,7 @@ async def crear_cotizacion(
 
         datos.append(
             {
-                "cd_dato": "710060",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyugue vinculado.
+                "cd_dato": "710060",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyuge vinculado.
                 "nu_bien": "1",
                 "valor": fe_nac_madre
             }

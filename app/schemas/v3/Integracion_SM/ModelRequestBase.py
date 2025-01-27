@@ -35,7 +35,7 @@ class Sexo(Enum):
 
 
 class Parentesco(Enum):
-    CONYUGUE = "CONYUGUE"
+    CONYUGE = "CONYUGE"
     HIJO = "HIJO"
     PADRE = "PADRE"
     MADRE = "MADRE"
@@ -99,7 +99,7 @@ class CrearPolizaBase(BaseModel):
     """
     persona: PersonaPolizaBase
     poliza: PolizaBase
-    tiene_conyugue: Optional[bool] = False
+    tiene_conyuge: Optional[bool] = False
     cantidad_hijos: Optional[int] = 0
     tiene_padre: Optional[bool] = False
     tiene_madre: Optional[bool] = False
