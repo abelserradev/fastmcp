@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.api.v1.Integration_SM.app import router as api_router_v1
 from app.middlewares.ConfigureMiddleware import configure_middleware
 from app.api.v2.Integration_SM.app import router as api_router_v2
+from app.api.v3.Integration_SM.app import router as api_router_v3
 
 from app.utils.v1.LoggerSingleton import logger
 
@@ -24,6 +25,7 @@ def read_root():
 
 app.include_router(api_router_v1, prefix="/api/v1/sm")
 app.include_router(api_router_v2, prefix="/api/v2/sm")
+app.include_router(api_router_v3, prefix="/api/v3/sm")
 
 
 logger.info("API started")

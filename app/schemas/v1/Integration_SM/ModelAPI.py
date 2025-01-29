@@ -342,7 +342,7 @@ class ConsultarPolizaBase(BaseModel):
     cd_area: int
     poliza: int
     certificado: int
-    nu_recibo: int
+    nu_recibo: Optional[int] = 0
 
 
 class InclusionAnexosPolizaBase(BaseModel):
