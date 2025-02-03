@@ -1,5 +1,4 @@
-from app.utils.v1.configs import APPLICATION, USER
-
+from app.utils.v1.configs import APPLICATION, USER, MID
 
 payload_cotizacion = {
     "coll_preguntas": {
@@ -214,4 +213,13 @@ payload_consultar_cotizacion = {
             "va_dato": ""
         }
     ]
+}
+
+payload_pasarela_pago = {
+    "aplicacion": "API_PAGO",
+    "funcionalidad": "REGISTRAR_PAGO",
+    "usuario": USER,
+    "datos": {
+        "mid": MID
+    }
 }
