@@ -14,3 +14,9 @@ class ResponsePagoBase(BaseModel):
     orden_comercio: int
     cd_aprobacion: int
     poliza_recibo_cuota: List[PolizaReciboCuotaResponseBase]
+
+
+class ResponseOTPMBU(BaseModel):
+    fecha_procesamiento: str
+    estatus: str
+    min_expiracion: str

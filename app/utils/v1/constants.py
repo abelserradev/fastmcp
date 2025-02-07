@@ -14,6 +14,7 @@ url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
 url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
 url_consultar_cotizacion = f"{SM_ENDPOINT}/consultarcotizaciones"
 url_registrar_pago = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/register"
+url_otp_mbu = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/otp_mbu"
 
 if ENV in ["production"]:
     url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/executeRep"

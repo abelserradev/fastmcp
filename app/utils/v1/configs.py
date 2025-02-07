@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     SM_PRIMARY_PASARELA_KEY: str
     SM_ENDPOINT_PASARELA_MS: str
     MID: str
+    MOCKUP: bool
+
 
     # Load the settings from the .env file
     model_config = SettingsConfigDict(env_file=".env")
@@ -53,5 +55,7 @@ SUMA_ASEGURADA = settings.SUMA_ASEGURADA
 SM_PRIMARY_PASARELA_KEY = settings.SM_PRIMARY_PASARELA_KEY
 SM_ENDPOINT_PASARELA_MS = settings.SM_ENDPOINT_PASARELA_MS
 MID = settings.MID
+MOCKUP = settings.MOCKUP
+
 # Log that the settings have been loaded
 logger.info("Settings loaded")

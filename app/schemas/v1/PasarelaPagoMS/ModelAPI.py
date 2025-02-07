@@ -381,7 +381,9 @@ class InstrumentoC2PBase(BaseModel):
     numero: int
     tp_identidad: str = Field(..., pattern=r"^[VE]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
-    nu_telefono: str = Field(..., pattern=r"^(0412|0414|0424|0416|0426)\d{7}$")
+    nu_telefono: str = Field(...,
+                             pattern=r"^58(412|414|416|424|426)\d{7}$",
+                             description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
     cd_banco: str = Field(..., pattern=r"^(0102|0104|0105|0108|0114|0115|0116|0128|0134|0137|0138|0146|0156|0157|0163|0166|0168|0169|0171|0173|0174|0175|0177|0191)$")
     otp: str
 
@@ -435,3 +437,18 @@ class RegistroPagoBase(BaseModel):
     recibo_poliza_pago: ReciboPagoBase
     pago: PagoBase
 
+class InstrumentoC2PMnuEnum(Enum):
+    C2P = "C2P"
+    TDD = "TDD"
+
+class InstrumentoModel(BaseModel):
+    tp_identidad: str = Field(..., pattern=r"^[VE]$", description="Cédula de identidad comienza con V o E, de venezolano o extranjero")
+    doc_identidad: str = Field(..., pattern=r"\d{5,10}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
+    nu_telefono: str = Field(...,
+                             pattern=r"^58(412|414|416|424|426)\d{7}$",
+                             description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
+
+
+class OtpMbuBase(BaseModel):
+    tipo_instrumento: InstrumentoC2PMnuEnum
+    instrumento: InstrumentoModel

@@ -223,3 +223,12 @@ payload_pasarela_pago = {
         "mid": MID
     }
 }
+
+payload_pasarela_otp = {
+"aplicacion": "API_PAGO",
+    "funcionalidad": "SOLICITAR_OTP_MBU",
+    "usuario": USER,
+    "datos": {
+        "mid": MID
+    }
+}
