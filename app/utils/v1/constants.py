@@ -1,4 +1,4 @@
-from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY, ENV
+from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY, ENV, SM_PRIMARY_PASARELA_KEY,SM_ENDPOINT_PASARELA_MS
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
 
@@ -13,6 +13,8 @@ url_consultar_poliza = f"{SM_ENDPOINT}/consultarpoliza"
 url_inclusion_anexos_poliza = f"{SM_ENDPOINT}/incanexpolivig"
 url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
 url_consultar_cotizacion = f"{SM_ENDPOINT}/consultarcotizaciones"
+url_registrar_pago = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/register"
+url_otp_mbu = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/otp_mbu"
 
 if ENV in ["production"]:
     url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/executeRep"
@@ -49,3 +51,13 @@ NU_TOTAL_CUOTAS = {
     "SEMESTRAL": 2,
     "ANUAL": 1
 }
+
+headers_pasarela_ms = {
+    "Ocp-Apim-Subscription-Key": SM_PRIMARY_PASARELA_KEY,
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Accept-Encoding": "gzip, deflate, br",
+}
+
