@@ -13,6 +13,7 @@ from app.utils.v1.constants import (url_registrar_pago,
                                     headers_pasarela_ms, url_otp_mbu
                                     )
 from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.SyncHttpx import sync_fetch_url
 from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp
 from datetime import datetime
 router = APIRouter(
@@ -28,13 +29,14 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
     status_code=status.HTTP_200_OK,
     summary="Registrar Pago Pasarela MS",
 )
-async def registrar_pago(
+def registrar_pago(
     request: RegistroPagoBase,
     client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
 
     data = request.model_dump()
+    logger.info(f"Data: {data}")
 
     recibo_poliza_pago = data.get("recibo_poliza_pago")
     pago = data.get("pago")
@@ -87,77 +89,82 @@ async def registrar_pago(
     match tipo_instrumento_pago:
         case "TDD":
             tipo_instrumento = "instrumento_tdd"
+            if "instrumento_tdc" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_tdc"]
+            if "instrumento_c2p" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_c2p"]
         case "C2P":
             tipo_instrumento = "instrumento_c2p"
+            if "instrumento_tdc" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_tdc"]
+            if "instrumento_tdd" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_tdd"]
         case "TDC":
             tipo_instrumento = "instrumento_tdc"
+            if "instrumento_tdd" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_tdd"]
+            if "instrumento_c2p" in payload_pasarela_pago["datos"].keys():
+                del payload_pasarela_pago["datos"]["instrumento_c2p"]
         case _:
             ...
 
     payload_pasarela_pago["datos"][tipo_instrumento] = instrumento
 
 
-    #try:
-    logger.info(f"URL:{url_registrar_pago}")
-    logger.info(f"HEADER: {headers_pasarela_ms}")
-    logger.info(f"Payload: {json.dumps(payload_pasarela_pago)}")
-    response = await fetch_url(
-        "POST",
-        url_registrar_pago,
-        headers_pasarela_ms,
-        payload_pasarela_pago
-    )
-    # except httpx.RequestError as e:
-    #     logger.error(f"Error en la solicitud: {e}")
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail="Error interno del servidor",
-    #     )
-    # except httpx.ReadTimeout as e:
-    #     logger.error(f"Tiempo de espera excedido: {e}")
-    #     raise HTTPException(
-    #         status_code=status.HTTP_408_REQUEST_TIMEOUT,
-    #         detail="Tiempo de espera excedido",
-    #     )
-    # except httpx.HTTPError as e:
-    #     logger.error(f"{e}")
-    #     raise HTTPException(
-    #         ah,
-    #         detail=f"{e}",
-    #     )
-    # finally:
-    #     try:
-    #         del (payload_pasarela_pago["datos"][tipo_instrumento])
-    #     except:
-    #         ...
+
+
+
+
+
+    try:
+        logger.info(f"URL:{url_registrar_pago}")
+        logger.info(f"HEADER: {headers_pasarela_ms}")
+        logger.info(f"Payload: {json.dumps(payload_pasarela_pago)}")
+        http_client = httpx.Client(verify=False)
+        response = http_client.post(
+            url_registrar_pago,
+            headers=headers_pasarela_ms,
+            json=payload_pasarela_pago,
+            timeout=None
+        )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
+
 
 
     if response.status_code != 200:
-        try:
-            del (payload_pasarela_pago["datos"][tipo_instrumento])
-        except:
-            ...
 
         logger.error(f"{response.json()}")
         raise HTTPException(status_code=response.status_code,
                             detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            del (payload_pasarela_pago["datos"][tipo_instrumento])
-        except:
-            ...
 
         logger.error(f"{response.json()}")
         raise HTTPException(status_code=response.status_code,
                             detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
 
 
-
     # # Convierte la respuesta en JSON
     response_json = response.json()
-    datos = response_json.get("datos")
-    return datos
+    result = response_json.get("datos")
+    return result
 
 
 
@@ -171,7 +178,7 @@ async def registrar_pago(
 async def otp_mbu(
     request: OtpMbuBase,
     #client: httpx.AsyncClient = Depends(get_client),
-    #api_key: str = Security(api_key_verifier),
+    api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump()
     tipo_instrumento = data.get("tipo_instrumento").value
@@ -180,11 +187,10 @@ async def otp_mbu(
     payload["datos"]["tipo_instrumento"] = tipo_instrumento
     match tipo_instrumento:
         case "C2P":
-            print(183)
             payload["datos"]["instrumento_c2p"] = instrumento
         case "TDD":
             print(186)
-            payload["datos"]["instrumento_tdd"] = instrumento
+
         case _:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de instrumento no es C2P o TDD")
 

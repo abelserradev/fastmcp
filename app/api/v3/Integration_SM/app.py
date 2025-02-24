@@ -88,7 +88,7 @@ async def crear_cotizacion(
 
         datos.append(
             {
-                "cd_dato": "710057",  # Fecha de nacimiento del conyuge. Se pasa si se tiene un conyuge vinculado.
+                "cd_dato": "710057",  # Fecha de nacimiento del padre.
                 "nu_bien": "1",
                 "valor": fe_nac_padre
             }
