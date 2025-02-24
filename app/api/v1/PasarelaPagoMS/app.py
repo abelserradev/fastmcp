@@ -106,13 +106,9 @@ def registrar_pago(
             if "instrumento_c2p" in payload_pasarela_pago["datos"].keys():
                 del payload_pasarela_pago["datos"]["instrumento_c2p"]
         case _:
-            ...
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de instrumento no es C2P,TDC o TDD")
 
     payload_pasarela_pago["datos"][tipo_instrumento] = instrumento
-
-
-
-
 
 
 
@@ -175,71 +171,72 @@ def registrar_pago(
     status_code=status.HTTP_200_OK,
     summary="Registrar Pago Pasarela MS",
 )
-async def otp_mbu(
+def otp_mbu(
     request: OtpMbuBase,
     #client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump()
+    logger.info(f"Data: {data}")
     tipo_instrumento = data.get("tipo_instrumento").value
+
     instrumento = data.get("instrumento")
     payload = payload_pasarela_otp.copy()
     payload["datos"]["tipo_instrumento"] = tipo_instrumento
+
     match tipo_instrumento:
         case "C2P":
-            payload["datos"]["instrumento_c2p"] = instrumento
-        case "TDD":
-            print(186)
 
+            payload["datos"]["instrumento_c2p"] = instrumento
+
+            if "instrumento_tdd" in payload["datos"].keys():
+
+                del payload["datos"]["instrumento_tdd"]
+        case "TDD":
+            payload["datos"]["instrumento_tdd"] = instrumento
+
+            if "instrumento_c2p" in payload["datos"].keys():
+
+                del payload["datos"]["instrumento_c2p"]
         case _:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de instrumento no es C2P o TDD")
 
-    logger.info(f"URL: {url_otp_mbu}")
+
     logger.info(f"Payload: {json.dumps(payload)}")
 
-    if not MOCKUP:
-        response = await fetch_url(
-            "POST",
-            url_otp_mbu,
-            headers_pasarela_ms,
-            payload_pasarela_pago
-        )
+    if MOCKUP:
+        # Mockup es  true.
+        now = datetime.now()
+        datos = {
+            "fecha_procesamiento": f"{now}",
+            "estatus": "La solicitud de la clave temporal de pago se realizó de manera exitosa",
+            "min_expiracion": "5"
+        }
+        return datos
 
-
-        try:
-            del payload["datos"]["instrumento_c2p"]
-        except KeyError:
-            ...
-
-        try:
-            del payload["datos"]["instrumento_tdd"]
-        except KeyError:
-            ...
-
-        if response.status_code != 200:
-            logger.error(f"{response.json()}")
-            raise HTTPException(status_code=response.status_code,
-                                detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
-
-        resp = response.json()
-
-        if resp["status"]["code"] != "EXITO":
-            logger.error(f"{resp["status"]["description"]}")
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail=f"{resp["status"]["description"]}")
+    http_client = httpx.Client(verify=False)
+    response = http_client.post(
+        url_otp_mbu,
+        headers=headers_pasarela_ms,
+        json=payload,
+        timeout=None
+    )
 
 
 
-        return resp["datos"]
+    if response.status_code != 200:
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+    resp = response.json()
+
+    if resp["status"]["code"] != "EXITO":
+        logger.error(f"{resp["status"]["description"]}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"{resp["status"]["description"]}")
 
 
-    # Mockup es  true.
-    now = datetime.now()
-    datos = {
-        "fecha_procesamiento": f"{now}",
-        "estatus": "La solicitud de la clave temporal de pago se realizó de manera exitosa",
-        "min_expiracion":"5"
-    }
-    logger.info(json.dumps(payload_pasarela_pago))
-    return datos
+    return resp["datos"]
+
 
