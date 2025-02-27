@@ -1,8 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union, Dict
+from typing import List, Optional, Union, Dict, ClassVar
+import re
 
-from pydantic import BaseModel, EmailStr, Field, validator, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class TipoDocumento(Enum):
@@ -452,3 +453,15 @@ class InstrumentoModel(BaseModel):
 class OtpMbuBase(BaseModel):
     tipo_instrumento: InstrumentoC2PMnuEnum
     instrumento: InstrumentoModel
+
+class TasaBCVBase(BaseModel):
+    fe_tasa: str
+
+    # Definimos un patrón de regex para validar el formato dd/mm/yyyy
+    fecha_regex: ClassVar[re.Pattern] = re.compile(r'^\d{2}/\d{2}/\d{4}$')
+
+    @field_validator('fe_tasa')
+    def validate_fe_tasa(cls, value):
+        if not cls.fecha_regex.match(value):
+            raise ValueError('El formato de fe_tasa debe ser dd/mm/yyyy')
+        return value

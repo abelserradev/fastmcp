@@ -20,3 +20,11 @@ class ResponseOTPMBU(BaseModel):
     fecha_procesamiento: str
     estatus: str
     min_expiracion: str
+
+class ResponseTasaBCV(BaseModel):
+    in_tasa: int
+    tasa_compra: float
+    cd_moneda: int
+    tasa_venta: float
+    cd_producto: int
+    fe_tasa: str
