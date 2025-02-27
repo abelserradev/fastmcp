@@ -5,16 +5,16 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.schemas.v1.PasarelaPagoMS.ModelAPI import RegistroPagoBase, OtpMbuBase
-from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponsePagoBase, ResponseOTPMBU
+from app.schemas.v1.PasarelaPagoMS.ModelAPI import RegistroPagoBase, OtpMbuBase, TasaBCVBase
+from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponsePagoBase, ResponseOTPMBU, ResponseTasaBCV
 from app.utils.v1.AsyncHttpx import get_client, fetch_url
 from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP
 from app.utils.v1.constants import (url_registrar_pago,
-                                    headers_pasarela_ms, url_otp_mbu
+                                    headers_pasarela_ms, url_otp_mbu, headers_suscripcion_ms, url_suscripcion_tasa_bcv
                                     )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.SyncHttpx import sync_fetch_url
-from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp
+from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv
 from datetime import datetime
 router = APIRouter(
     tags=["Pasarela Pago MS Version 1"],
@@ -214,14 +214,32 @@ def otp_mbu(
         }
         return datos
 
-    http_client = httpx.Client(verify=False)
-    response = http_client.post(
-        url_otp_mbu,
-        headers=headers_pasarela_ms,
-        json=payload,
-        timeout=None
-    )
-
+    try:
+        http_client = httpx.Client(verify=False)
+        response = http_client.post(
+            url_otp_mbu,
+            headers=headers_pasarela_ms,
+            json=payload,
+            timeout=None
+        )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
 
 
     if response.status_code != 200:
@@ -239,4 +257,69 @@ def otp_mbu(
 
     return resp["datos"]
 
+
+
+
+
+@router.post(
+    "/consultar_tasa_bcv",
+    response_model=ResponseTasaBCV,
+    status_code=status.HTTP_200_OK,
+    summary="Consulta Tasa BCV",
+)
+def consulta_tasa_bcv(
+    request: TasaBCVBase,
+    #client: httpx.AsyncClient = Depends(get_client),
+    api_key: str = Security(api_key_verifier),
+):
+    data = request.model_dump()
+    logger.info(f"Data: {data}")
+    payload = payload_tasa_bcv.copy()
+
+    payload["tasa"]["fe_tasa"] = data["fe_tasa"]
+
+    logger.info(f"Header:{headers_suscripcion_ms}")
+    logger.info(f"URL: {url_suscripcion_tasa_bcv}")
+    logger.info(f"Payload: {payload}")
+
+    try:
+        http_client = httpx.Client(verify=False)
+        response = http_client.post(
+            url_suscripcion_tasa_bcv,
+            headers=headers_suscripcion_ms,
+            json=payload,
+            timeout=None
+        )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
+
+    if response.status_code != 200:
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+    resp = response.json()
+
+    if resp["status"]["code"] != "EXITO":
+        logger.error(f"{resp["status"]["description"]}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"{resp["status"]["description"]}")
+
+    return resp["tasa"][0]
 

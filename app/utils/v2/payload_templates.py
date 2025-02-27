@@ -232,3 +232,14 @@ payload_pasarela_otp = {
         "mid": MID
     }
 }
+
+
+payload_tasa_bcv = {
+    "aplicacion": "AFINIDAD",
+    "funcionalidad": "CONSULTAR_TASA_CAMBIO_V",
+    "usuario": USER,
+    "tasa": {
+        "in_tasa": 1,
+        "cd_moneda":2,
+    }
+}

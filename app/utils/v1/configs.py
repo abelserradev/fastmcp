@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     SUMA_ASEGURADA: int
     SM_PRIMARY_PASARELA_KEY: str
     SM_ENDPOINT_PASARELA_MS: str
+    SM_PRIMARY_SUSCRIPTION_KEY: str
+    SM_ENDPOINT_SUSCRIPCION: str
     MID: str
     MOCKUP: bool
 
@@ -56,6 +58,7 @@ SM_PRIMARY_PASARELA_KEY = settings.SM_PRIMARY_PASARELA_KEY
 SM_ENDPOINT_PASARELA_MS = settings.SM_ENDPOINT_PASARELA_MS
 MID = settings.MID
 MOCKUP = settings.MOCKUP
-
+SM_PRIMARY_SUSCRIPTION_KEY = settings.SM_PRIMARY_SUSCRIPTION_KEY
+SM_ENDPOINT_SUSCRIPCION = settings.SM_ENDPOINT_SUSCRIPCION
 # Log that the settings have been loaded
 logger.info("Settings loaded")
