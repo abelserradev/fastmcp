@@ -1,5 +1,4 @@
-from app.utils.v1.configs import APPLICATION, USER
-
+from app.utils.v1.configs import APPLICATION, USER, MID
 
 payload_cotizacion = {
     "coll_preguntas": {
@@ -214,4 +213,33 @@ payload_consultar_cotizacion = {
             "va_dato": ""
         }
     ]
+}
+
+payload_pasarela_pago = {
+    "aplicacion": "API_PAGO",
+    "funcionalidad": "REGISTRAR_PAGO",
+    "usuario": USER,
+    "datos": {
+        "mid": MID
+    }
+}
+
+payload_pasarela_otp = {
+"aplicacion": "API_PAGO",
+    "funcionalidad": "SOLICITAR_OTP_MBU",
+    "usuario": USER,
+    "datos": {
+        "mid": MID
+    }
+}
+
+
+payload_tasa_bcv = {
+    "aplicacion": "AFINIDAD",
+    "funcionalidad": "CONSULTAR_TASA_CAMBIO_V",
+    "usuario": USER,
+    "tasa": {
+        "in_tasa": 1,
+        "cd_moneda":2,
+    }
 }
