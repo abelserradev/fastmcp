@@ -11,7 +11,7 @@ from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
 from app.schemas.v4.Integracion_SM.ModelRequestBase import CrearPolizaBase
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
 #from app.schemas.v3.Integracion_SM.ModelResponseBase import CotizacionResponse
-#from app.utils.v1.AsyncHttpx import fetch_url, get_client
+
 
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
 from app.utils.v1.constants import (
@@ -21,7 +21,7 @@ from app.utils.v1.constants import (
     url_cotizar, PARENTESCO
 )
 from app.utils.v1.LoggerSingleton import logger
-
+from app.utils.v2.SyncHttpx import sync_fetch_url
 
 from app.utils.v3.payload_templates import payload_cotizacion
 
@@ -38,7 +38,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
     status_code=status.HTTP_200_OK,
     summary="Crear cotizacion de persona en Seguros Mercantil",
 )
-async def crear_cotizacion(
+def crear_cotizacion(
         request: CrearPolizaBase,
         #client: httpx.AsyncClient = Depends(get_client),
         api_key: str = Security(api_key_verifier),
@@ -221,7 +221,7 @@ async def crear_cotizacion(
     try:
         logger.info(f"Payload-> {json.dumps(payload)}")
 
-        response = await  fetch_url(
+        response = sync_fetch_url(
             "POST",
             url_cotizar,
             headers,

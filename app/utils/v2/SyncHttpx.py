@@ -16,13 +16,13 @@ def sync_fetch_url(method: str, url: str, headers: dict = None, payload: dict = 
     with httpx.Client() as client:
         match method.upper():
             case 'GET':
-                response = client.get(url, headers=headers)
+                response = client.get(url, headers=headers, timmeout=None)
             case 'POST':
-                response = client.post(url, headers=headers, json=payload)
+                response = client.post(url, headers=headers, json=payload, timmeout=None)
             case 'PUT':
-                response = client.put(url, headers=headers, json=payload)
+                response = client.put(url, headers=headers, json=payload, timmeout=None)
             case 'DELETE':
-                response = client.delete(url, headers=headers, json=payload)
+                response = client.delete(url, headers=headers, json=payload, timmeout=None)
             case _:
                 raise ValueError("Unsupported HTTP method")
 
