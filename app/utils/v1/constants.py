@@ -4,7 +4,7 @@ from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY, ENV, SM_PRIMARY_
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
 
 
-frecuencia_cuota = {"MENSUAL": 201, "TRIMESTRAL": 202, "SEMESTRAL": 203, "ANUAL": 204}
+frecuencia_cuota = {"MENSUAL": "201", "TRIMESTRAL": "202", "SEMESTRAL": "203", "ANUAL": "204"}
 
 url_consult_persona = f"{SM_ENDPOINT}/consultarpersona"
 url_crear_persona = f"{SM_ENDPOINT}/crearpersona"

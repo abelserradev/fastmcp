@@ -15,13 +15,13 @@ async def get_client():
 async def fetch_url(method: str, url: str, headers: dict = None, payload: dict = None):
     async with httpx.AsyncClient() as client:
         if method.upper() == 'GET':
-            response = await client.get(url, headers=headers)
+            response = await client.get(url, headers=headers,timeout=None)
         elif method.upper() == 'POST':
-            response = await client.post(url, headers=headers, json=payload)
+            response = await client.post(url, headers=headers, json=payload,timeout=None)
         elif method.upper() == 'PUT':
-            response = await client.put(url, headers=headers, json=payload)
+            response = await client.put(url, headers=headers, json=payload,timeout=None)
         elif method.upper() == 'DELETE':
-            response = await client.delete(url, headers=headers, json=payload)
+            response = await client.delete(url, headers=headers, json=payload,timeout=None)
         else:
             raise ValueError("Unsupported HTTP method")
 

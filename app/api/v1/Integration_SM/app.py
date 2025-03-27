@@ -29,6 +29,7 @@ from app.utils.v1.payload_templates import (payload_consultar_persona,
                                             payload_emitir_poliza,
                                             payload_inclusion_anexos_poliza,
                                             payload_persona)
+from app.utils.v2.SyncHttpx import sync_fetch_url
 
 router = APIRouter(
     tags=["MS Integration Version 1"],
@@ -134,7 +135,7 @@ async def consultar_persona(
     status_code=status.HTTP_201_CREATED,
     summary="Crear persona en Seguros Mercantil",
 )
-async def crear_persona(
+def crear_persona(
     request: CrearPersonaBase,
     client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
@@ -188,7 +189,7 @@ async def crear_persona(
 
     try:
 
-        response = await fetch_url(
+        response = sync_fetch_url(
             "POST",
             url_crear_persona,
             headers,
