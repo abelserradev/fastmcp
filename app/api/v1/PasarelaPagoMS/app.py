@@ -335,13 +335,13 @@ def consulta_tasa_bcv(
 @router.post(
     "/notificacion",
     #response_model=ResponseOTPMBU,
-    #status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_200_OK,
     summary="Registrar Notificacion Pago a MS",
 )
 def notificacion_pago(
     request: NotificacionPagoBase,
     #client: httpx.AsyncClient = Depends(get_client),
-    #api_key: str = Security(api_key_verifier),
+    api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump()
     tipo_pago = data.get("tipo_pago").value
