@@ -41,7 +41,26 @@ def registrar_pago(
     client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
+    """
+    Handles the registration of a payment via a payment gateway. This function extracts necessary
+    payment information from a request, processes the data, constructs a payload, and sends it to
+    the payment gateway. It supports multiple types of payment instruments, such as C2P, TDD,
+    and TDC, and ensures correct processing of each type. In case of errors during the operation,
+    appropriate HTTP exceptions are raised.
 
+    Args:
+        request (RegistroPagoBase): Request payload containing payment details and policy receipt.
+        client (httpx.AsyncClient, optional): Asynchronous HTTP client used for making requests.
+        api_key (str): Security token for verifying the request.
+
+    Returns:
+        dict: Parsed data from the payment gateway response.
+
+    Raises:
+        HTTPException: Raised with a 400 status if the payment instrument type is invalid, with a
+            408 status if the request times out, with a 500 status for internal server errors,
+            and with other statuses and messages specific to the payment gateway response.
+    """
     data = request.model_dump()
     logger.info(f"Data: {data}")
 
@@ -183,6 +202,31 @@ def otp_mbu(
     #client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
+    """
+    Handles the OTP generation and submission process for specified payment modalities. This
+    function routes POST requests to the `/otp_mbu` endpoint, performs input validation, constructs
+    the required payload for OTP processing, sends the payload to the backend service, and evaluates
+    the response. It supports two types of instruments: `C2P` and `TDD`.
+
+    Args:
+        request (OtpMbuBase): Encapsulates the request data containing the required information
+            to process the OTP for the specific instrument. The request must conform to the
+            structure defined by `OtpMbuBase`.
+        api_key (str): The API key required for securing the operation and authenticating the
+            incoming request.
+
+    Raises:
+        HTTPException: Raised for any of the following cases:
+            - If `tipo_instrumento` is neither `C2P` nor `TDD`.
+            - For unsuccessful HTTP responses with a status code other than 200.
+            - If the server encounters internal errors, timeout, or other critical issues.
+            - For failed OTP processing responses where the backend does not return success status.
+
+    Returns:
+        dict: Contains the processed response details, including expiration details or statuses,
+            depending on the backend service output. For mock operations, it includes simulated
+            metadata like processing time and expiration information.
+    """
     data = request.model_dump()
     logger.info(f"Data: {data}")
     tipo_instrumento = data.get("tipo_instrumento").value
@@ -279,6 +323,30 @@ def consulta_tasa_bcv(
     #client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
+    """
+    Handles the API endpoint for consulting the BCV exchange rate. This function receives
+    a request object and an API key, processes the data, makes an HTTP request to a given
+    endpoint, and returns the exchange rate information. The function logs all relevant
+    steps, including payload details and error scenarios, while ensuring proper exception
+    handling for request failures or server errors.
+
+    Args:
+        request (TasaBCVBase): The request object containing the data required for the
+            BCV exchange rate query, such as the 'fe_tasa' field.
+        api_key (str): A security credential provided for API access.
+
+    Returns:
+        dict: A dictionary object representing the queried BCV exchange rate, specifically
+        the first exchange rate object from the 'tasa' list in the response.
+
+    Raises:
+        HTTPException: In cases where:
+            - The server encounters an internal error during processing.
+            - There is a timeout while waiting for the external service response.
+            - There is an HTTP error during the HTTP request to the exchange rate service.
+            - The response indicates an unsuccessful status (not equal to "EXITO").
+            - The response status code is not 200.
+    """
     data = request.model_dump()
     logger.info(f"Data: {data}")
     payload = payload_tasa_bcv.copy()
@@ -343,6 +411,30 @@ def notificacion_pago(
     #client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
+    """
+    Handles the registration of a payment notification to the microservices system.
+
+    This function processes the payment notification request, organizes its data into the
+    appropriate payload format based on the type of payment, and sends the data to the
+    configured endpoint. It also handles potential errors during the HTTP request and
+    validates the response received from the server.
+
+    Args:
+        request (NotificacionPagoBase): An object containing the base data of the payment
+            notification, including payment details and payer information.
+        api_key (str): A security token used to validate the API request, provided by the
+            Security dependency.
+
+    Raises:
+        HTTPException: If the payment type is not "USD" or "BS".
+        HTTPException: If there is an error during the request to the microservices server,
+            including server/internal errors, timeouts, or invalid response data.
+        HTTPException: If the response does not indicate success (status code or details).
+
+    Returns:
+        Dict: A dictionary representing the success response data from the microservices,
+        extracted from the "datos" key in the server's JSON response.
+    """
     data = request.model_dump()
     tipo_pago = data.get("tipo_pago").value
 

@@ -485,6 +485,21 @@ class TipoPagoEnum(Enum):
 
 
 class PagoBase(BaseModel):
+    """
+    Represents the base payment model.
+
+    This class serves as a core model for handling payment-related data within the system. It provides
+    attributes to define payment and receipt currency, amounts, approval codes, and exchange rates.
+    Additionally, a utility method is included to serialize the model, excluding fields with None values.
+
+    Attributes:
+        moneda_pago (TipoPagoEnum): The currency used for payment.
+        moneda_recibo (Optional[str]): The optional currency of the receipt.
+        monto_recibo (Optional[str]): The optional amount of the receipt.
+        monto_pago (str): The mandatory amount of payment.
+        cd_aprobacion (str): A mandatory approval code for the payment transaction.
+        tasa_cambio (Optional[str]): An optional exchange rate value.
+    """
     moneda_pago: TipoPagoEnum
     moneda_recibo: Optional[str] = None
     monto_recibo: Optional[str] = None
@@ -500,6 +515,28 @@ class PagoBase(BaseModel):
 
 
 class NotificacionPagoBase(BaseModel):
+    """
+    Representation of the base payment notification model.
+
+    This class serves as a foundational model for payment notification,
+    encompassing key details about the payment transaction such as payer
+    information, payment type, and associated policy details. It is
+    designed to help structure and organize payment notification data
+    efficiently for further processing in related applications.
+
+    Attributes:
+        poliza_recibo_cuota (List[PolizaReciboCuotaBase]): List of policy
+            receipt installment details associated with the payment.
+        tipo_instrumento_pago (Optional[str]): Identifier for the type of
+            payment instrument used, if applicable. Defaults to an empty
+            string.
+        nombre_pagador (str): Full name of the payer associated with the
+            payment.
+        tipo_pago (TipoPagoEnum): Type of the payment, indicating its
+            category or classification as defined by the enumeration.
+        notificacion_pago (PagoBase): Payment notification details
+            encapsulated in a base payment model.
+    """
     poliza_recibo_cuota: List[PolizaReciboCuotaBase]
     tipo_instrumento_pago: Optional[str] = ""
     nombre_pagador: str
