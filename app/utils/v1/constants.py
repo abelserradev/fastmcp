@@ -7,6 +7,7 @@ from app.utils.v1.configs import (
     SM_PRIMARY_SUSCRIPTION_KEY,
     SM_ENDPOINT_SUSCRIPCION,
     SM_ENDPOINT_NOTIFICACION_PAGO,
+    SM_NOTIFICACION_PAGO_KEY,
 )
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
@@ -74,6 +75,16 @@ headers_pasarela_ms = {
 
 headers_suscripcion_ms = {
     "Ocp-Apim-Subscription-Key": SM_PRIMARY_SUSCRIPTION_KEY,
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Accept-Encoding": "gzip, deflate, br",
+}
+
+
+headers_notificacion_pago_ms = {
+    "Ocp-Apim-Subscription-Key": SM_NOTIFICACION_PAGO_KEY,
     "Content-Type": "application/json",
     "Cache-Control": "no-cache",
     "Accept": "*/*",

@@ -14,10 +14,15 @@ from app.schemas.v1.PasarelaPagoMS.ModelAPI import (
 from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponsePagoBase, ResponseOTPMBU, ResponseTasaBCV
 from app.utils.v1.AsyncHttpx import get_client, fetch_url
 from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP
-from app.utils.v1.constants import (url_registrar_pago,
-                                    headers_pasarela_ms, url_otp_mbu, headers_suscripcion_ms, url_suscripcion_tasa_bcv,
-                                    url_notificacion_pago
-                                    )
+from app.utils.v1.constants import (
+    url_registrar_pago,
+    headers_pasarela_ms,
+    url_otp_mbu,
+    headers_suscripcion_ms,
+    url_suscripcion_tasa_bcv,
+    url_notificacion_pago,
+    headers_notificacion_pago_ms,
+)
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.SyncHttpx import sync_fetch_url
 from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv, \
@@ -473,11 +478,11 @@ def notificacion_pago(
     try:
         logger.info(json.dumps(payload))
         logger.info(f"URL:{url_notificacion_pago}")
-        logger.info(f"HEADER: {headers_pasarela_ms}")
+        logger.info(f"HEADER: {headers_notificacion_pago_ms}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
             url_notificacion_pago,
-            headers=headers_pasarela_ms,
+            headers=headers_notificacion_pago_ms,
             json=payload,
             timeout=None
         )
@@ -504,13 +509,13 @@ def notificacion_pago(
 
         logger.error(f"{response.json()}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=f"{response.json()}")
 
     if response.json()["status"]["code"] != "EXITO":
 
         logger.error(f"{response.json()}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=f"{response.json()} ")
 
 
     # # Convierte la respuesta en JSON
