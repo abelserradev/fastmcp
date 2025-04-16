@@ -1,5 +1,13 @@
-from app.utils.v1.configs import SM_ENDPOINT, SUBSCRIPTION_KEY, ENV, SM_PRIMARY_PASARELA_KEY, SM_ENDPOINT_PASARELA_MS, \
-    SM_PRIMARY_SUSCRIPTION_KEY, SM_ENDPOINT_SUSCRIPCION
+from app.utils.v1.configs import (
+    SM_ENDPOINT,
+    SUBSCRIPTION_KEY,
+    ENV,
+    SM_PRIMARY_PASARELA_KEY,
+    SM_ENDPOINT_PASARELA_MS,
+    SM_PRIMARY_SUSCRIPTION_KEY,
+    SM_ENDPOINT_SUSCRIPCION,
+    SM_ENDPOINT_NOTIFICACION_PAGO,
+)
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
 
@@ -16,6 +24,7 @@ url_cotizar = f"{SM_ENDPOINT}/cotizarglobal"
 url_consultar_cotizacion = f"{SM_ENDPOINT}/consultarcotizaciones"
 url_registrar_pago = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/register"
 url_otp_mbu = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/otp_mbu"
+url_notificacion_pago = f"{SM_ENDPOINT_NOTIFICACION_PAGO}/notify_external_payment"
 url_suscripcion_tasa_bcv = f"{SM_ENDPOINT_SUSCRIPCION}/consultartasascambio"
 if ENV in ["production"]:
     url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/executeRep"
