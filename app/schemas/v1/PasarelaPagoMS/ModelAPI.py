@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union, Dict, ClassVar
+from typing import List, Optional, Union, ClassVar
 import re
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -465,3 +465,43 @@ class TasaBCVBase(BaseModel):
         if not cls.fecha_regex.match(value):
             raise ValueError('El formato de fe_tasa debe ser dd/mm/yyyy')
         return value
+
+
+class PolizaReciboCuotaBase(BaseModel):
+    cd_entidad: Optional[str] = "1"
+    cd_area: Optional[str] ="71"
+    nu_poliza: str
+    nu_certificado: Optional[str] = "1"
+    cd_recibo: str
+    nu_convenio_pago: str
+    nu_cuota: Optional[str] = "1"
+
+
+
+
+class TipoPagoEnum(Enum):
+    USD = "USD"
+    BS = "BS"
+
+
+class PagoBase(BaseModel):
+    moneda_pago: TipoPagoEnum
+    moneda_recibo: Optional[str] = None
+    monto_recibo: Optional[str] = None
+    monto_pago: str
+    cd_aprobacion: str
+    tasa_cambio: Optional[str] = None
+
+    # Ejemplo de serialización que excluye campos con valor None:
+    def to_dict(self) -> dict:
+        return self.model_dump(exclude_none=True)
+
+
+
+
+class NotificacionPagoBase(BaseModel):
+    poliza_recibo_cuota: List[PolizaReciboCuotaBase]
+    tipo_instrumento_pago: Optional[str] = ""
+    nombre_pagador: str
+    tipo_pago: TipoPagoEnum
+    notificacion_pago: PagoBase

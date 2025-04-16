@@ -5,16 +5,23 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.schemas.v1.PasarelaPagoMS.ModelAPI import RegistroPagoBase, OtpMbuBase, TasaBCVBase
+from app.schemas.v1.PasarelaPagoMS.ModelAPI import (
+    RegistroPagoBase,
+    OtpMbuBase,
+    TasaBCVBase,
+    NotificacionPagoBase,
+)
 from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponsePagoBase, ResponseOTPMBU, ResponseTasaBCV
 from app.utils.v1.AsyncHttpx import get_client, fetch_url
 from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP
 from app.utils.v1.constants import (url_registrar_pago,
-                                    headers_pasarela_ms, url_otp_mbu, headers_suscripcion_ms, url_suscripcion_tasa_bcv
+                                    headers_pasarela_ms, url_otp_mbu, headers_suscripcion_ms, url_suscripcion_tasa_bcv,
+                                    url_notificacion_pago
                                     )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.SyncHttpx import sync_fetch_url
-from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv
+from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv, \
+    payload_notificacion_pago
 from datetime import datetime
 router = APIRouter(
     tags=["Pasarela Pago MS Version 1"],
@@ -323,3 +330,98 @@ def consulta_tasa_bcv(
 
     return resp["tasa"][0]
 
+
+
+@router.post(
+    "/notificacion",
+    #response_model=ResponseOTPMBU,
+    #status_code=status.HTTP_200_OK,
+    summary="Registrar Notificacion Pago a MS",
+)
+def notificacion_pago(
+    request: NotificacionPagoBase,
+    #client: httpx.AsyncClient = Depends(get_client),
+    #api_key: str = Security(api_key_verifier),
+):
+    data = request.model_dump()
+    tipo_pago = data.get("tipo_pago").value
+
+    payload = payload_notificacion_pago.copy()
+    payload["datos"]["poliza_recibo_cuota"] = data["poliza_recibo_cuota"]
+    payload["datos"]["tipo_instrumento_pago"] = data["tipo_instrumento_pago"]
+    payload["datos"]["nombre_pagador"] = data["nombre_pagador"]
+
+    match tipo_pago:
+        case "USD":
+            payload["datos"]["notificar_estandar"] = {
+                "moneda_pago": data["notificacion_pago"]["moneda_pago"].value,
+                "monto_pago": data["notificacion_pago"]["monto_pago"],
+                "cd_aprobacion": data["notificacion_pago"]["cd_aprobacion"]
+            }
+            try:
+                del(payload["datos"]["notificar_multimoneda"])
+            except KeyError:
+                ...
+        case "BS":
+            payload["datos"]["notificar_multimoneda"] = {
+                "moneda_pago": data["notificacion_pago"]["moneda_pago"].value,
+                "monto_pago": data["notificacion_pago"]["monto_pago"],
+                "cd_aprobacion": data["notificacion_pago"]["cd_aprobacion"],
+                "moneda_recibo": data["notificacion_pago"]["moneda_recibo"],
+                "monto_recibo": data["notificacion_pago"]["monto_recibo"],
+                "tasa_cambio": data["notificacion_pago"]["tasa_cambio"]
+            }
+            try:
+                del(payload["datos"]["notificar_estandar"])
+            except KeyError:
+                ...
+        case _:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de pago tiene que ser USD o BS")
+
+    try:
+        logger.info(json.dumps(payload))
+        logger.info(f"URL:{url_notificacion_pago}")
+        logger.info(f"HEADER: {headers_pasarela_ms}")
+        http_client = httpx.Client(verify=False)
+        response = http_client.post(
+            url_notificacion_pago,
+            headers=headers_pasarela_ms,
+            json=payload,
+            timeout=None
+        )
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{e}",
+        )
+
+    if response.status_code != 200:
+
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+    if response.json()["status"]["code"] != "EXITO":
+
+        logger.error(f"{response.json()}")
+        raise HTTPException(status_code=response.status_code,
+                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+
+
+    # # Convierte la respuesta en JSON
+    response_json = response.json()
+    result = response_json.get("datos")
+    return result
