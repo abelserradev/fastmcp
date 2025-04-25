@@ -250,12 +250,12 @@ def crear_cotizacion(
     if response.status_code != 200:
         logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=f"{response.text} ")
 
     if response.json()["status"]["code"] != "EXITO":
         logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=f"{response.text} ")
 
     # convertir response to JSON
     response_json = response.json()
