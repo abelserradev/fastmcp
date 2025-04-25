@@ -219,9 +219,9 @@ def crear_cotizacion(
     payload["coll_generales"] = {"generales": [general]}
     payload["coll_grpaseg"] = {"grpaseg": grpasegs}
     try:
-        logger.info(f"URL: {url_cotizar}")
+        logger.info(f"URL-> {url_cotizar}")
         logger.info(f"Payload-> {json.dumps(payload)}")
-        logger.info(f: {headers})
+        logger.info(f"headers-> {headers}")
         response = sync_fetch_url(
             "POST",
             url_cotizar,
