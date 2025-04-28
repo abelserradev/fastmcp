@@ -1,10 +1,4 @@
 image: python:3.12
-
-pipelines:
-  branches:
-    staging:
-      - step: *deploy-to-ec2-staging
-
 definitions:
   steps:
     - step: &deploy-to-ec2-staging
@@ -41,3 +35,9 @@ definitions:
           docker-compose down
           docker-compose up -d --build --force-recreate # Construye la imagen y levanta los contenedores
     - echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"
+
+pipelines:
+  branches:
+    staging:
+      - step: *deploy-to-ec2-staging
+
