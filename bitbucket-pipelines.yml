@@ -1,17 +1,5 @@
 image: python:3.12
 definitions:
-  steps:
-    - step: &deploy-to-ec2-staging
-        name: Deploy to AWS EC2 (Staging)
-        deployment: staging
-        script:
-          - *deploy-script-local-build
-        variables:
-          EC2_USER: $EC2_STAGING_USER
-          EC2_IP: $EC2_STAGING_IP
-          EC2_PRIVATE_KEY: $EC2_STAGING_PRIVATE_KEY
-          REMOTE_PATH: '/home/$EC2_STAGING_USER/app'
-
   script: &deploy-script-local-build
     - echo "Deploying to AWS EC2 instance..."
     - apt-get update && apt-get install -y openssh-client
@@ -35,6 +23,19 @@ definitions:
           docker-compose down
           docker-compose up -d --build --force-recreate # Construye la imagen y levanta los contenedores
     - echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"
+  steps:
+    - step: &deploy-to-ec2-staging
+        name: Deploy to AWS EC2 (Staging)
+        deployment: staging
+        script:
+          - *deploy-script-local-build
+        variables:
+          EC2_USER: $EC2_STAGING_USER
+          EC2_IP: $EC2_STAGING_IP
+          EC2_PRIVATE_KEY: $EC2_STAGING_PRIVATE_KEY
+          REMOTE_PATH: '/home/$EC2_STAGING_USER/app'
+
+
 
 pipelines:
   branches:
