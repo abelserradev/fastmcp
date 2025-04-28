@@ -1,0 +1,97 @@
+image: atlassian/default-image:3
+
+definitions:
+  steps:
+    - step: &build-test
+        name: Build and Test
+        services:
+          - docker
+        script:
+          - docker-compose -f docker-compose_test.yml build
+          - docker-compose -f docker-compose_test.yml up -d
+          - sleep 10  # Give the service time to start
+          - docker-compose -f docker-compose_test.yml down
+
+pipelines:
+  branches:
+    main:
+      - step: *build-test
+      - step:
+          name: Deploy to EC2
+          deployment: production
+          services:
+            - docker
+          script:
+            # Install AWS CLI
+            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            - unzip awscliv2.zip
+            - ./aws/install
+            
+            # Configure AWS credentials
+            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            - aws configure set default.region $AWS_REGION
+            
+            # Copy files to EC2 instance
+            - pipe: atlassian/scp-deploy:1.4.0
+              variables:
+                USER: $EC2_USER
+                SERVER: $EC2_HOST
+                SSH_KEY: $SSH_PRIVATE_KEY
+                REMOTE_PATH: '/home/$EC2_USER/app'
+                LOCAL_PATH: '.'
+                
+            # SSH into EC2 and deploy
+            - pipe: atlassian/ssh-run:0.4.0
+              variables:
+                SSH_USER: $EC2_USER
+                SERVER: $EC2_HOST
+                SSH_KEY: $SSH_PRIVATE_KEY
+                MODE: 'script'
+                COMMAND: |
+                  cd /home/$EC2_USER/app
+                  docker-compose -f docker-compose_test.yml up --build -d
+
+  pull-requests:
+    '**':
+      - step: *build-test
+
+  custom:
+    manual-deploy:
+      - step: *build-test
+      - step:
+          name: Manual Deploy to EC2
+          deployment: production
+          trigger: manual
+          services:
+            - docker
+          script:
+            # Install AWS CLI
+            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            - unzip awscliv2.zip
+            - ./aws/install
+            
+            # Configure AWS credentials
+            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            - aws configure set default.region $AWS_REGION
+            
+            # Copy files to EC2 instance
+            - pipe: atlassian/scp-deploy:1.4.0
+              variables:
+                USER: $EC2_USER
+                SERVER: $EC2_HOST
+                SSH_KEY: $SSH_PRIVATE_KEY
+                REMOTE_PATH: '/home/$EC2_USER/app'
+                LOCAL_PATH: '.'
+                
+            # SSH into EC2 and deploy
+            - pipe: atlassian/ssh-run:0.4.0
+              variables:
+                SSH_USER: $EC2_USER
+                SERVER: $EC2_HOST
+                SSH_KEY: $SSH_PRIVATE_KEY
+                MODE: 'script'
+                COMMAND: |
+                  cd /home/$EC2_USER/app
+                  docker-compose -f docker-compose_test.yml up --build -d
