@@ -13,13 +13,13 @@ pipelines:
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
 
-#             - ssh -o StrictHostKeyChecking=no ec2-user@$STAGING_EC2_HOST "
-#                 if [ ! -d ~/app-staging ]; then
-#                   git clone $BITBUCKET_GIT_SSH_ORIGIN app-staging;
-#                 else
-#                   cd app-staging && git pull origin staging;
-#                 fi
-#               "
+            - ssh -o StrictHostKeyChecking=no ec2-user@$STAGING_EC2_HOST "
+                if [ ! -d ~/staging ]; then
+                  git clone $BITBUCKET_GIT_SSH_ORIGIN staging;
+                else
+                  cd app-staging && git pull origin staging;
+                fi
+              "
 
 #             - ssh ec2-user@$STAGING_EC2_HOST "
 #                 cd app-staging;
