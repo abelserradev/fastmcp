@@ -9,7 +9,7 @@ pipelines:
 #             - docker
           script:
             - mkdir -p ~/.ssh
-            - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            - echo $STAGING_SSH_PRIVATE_KEY > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
 
