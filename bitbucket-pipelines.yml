@@ -5,8 +5,8 @@ pipelines:
     staging:
       - step:
           name: Deploy Staging Environment
-          caches:
-            - docker
+#           caches:
+#             - docker
           script:
             - mkdir -p ~/.ssh
             - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
