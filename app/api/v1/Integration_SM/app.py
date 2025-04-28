@@ -304,7 +304,9 @@ async def crear_cotizacion(
         )
 
     try:
-
+        logger.info(f"URL: {url_crear_cotizacion}")
+        logger.info(f"headers: {headers}")
+        logger.info(f"Body: {body}")
         response = await fetch_url(
             "POST",
             url_crear_cotizacion,
