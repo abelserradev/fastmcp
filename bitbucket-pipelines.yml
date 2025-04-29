@@ -12,7 +12,6 @@ pipelines:
             - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
-            - pwd
             # Install AWS CLI
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip
@@ -24,7 +23,13 @@ pipelines:
             - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             - aws configure set default.region $AWS_REGION
             - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .
-            - ls -la
+            - pipe: atlassian/scp-deploy:1.4.0
+              variables:
+                  USER: $EC2_USER
+                  SERVER: $STAGING_EC2_HOST
+                  SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                  REMOTE_PATH: '/home/$EC2_USER/app'
+                  LOCAL_PATH: '.'
 
 #             - ssh ec2-user@$STAGING_EC2_HOST "
 #                 cd app-staging;
