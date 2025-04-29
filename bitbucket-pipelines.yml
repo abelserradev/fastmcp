@@ -24,13 +24,14 @@ pipelines:
             - aws configure set default.region $AWS_REGION
             - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .
             - apt-get update && apt-get install -y openssh-client
-            - pipe: atlassian/scp-deploy:1.5.2
-              variables:
-                  USER: $EC2_USER
-                  SERVER: $STAGING_EC2_HOST
-                  SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-                  REMOTE_PATH: '/home/$EC2_USER/app'
-                  LOCAL_PATH: '.'
+            - scp -r . $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
+#             - pipe: atlassian/scp-deploy:1.5.2
+#               variables:
+#                   USER: $EC2_USER
+#                   SERVER: $STAGING_EC2_HOST
+#                   SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+#                   REMOTE_PATH: '/home/$EC2_USER/staging'
+#                   LOCAL_PATH: '.'
 
 #             - ssh ec2-user@$STAGING_EC2_HOST "
 #                 cd app-staging;
