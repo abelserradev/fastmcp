@@ -12,6 +12,10 @@ pipelines:
             - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
+            # Install AWS CLI
+            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            - unzip awscliv2.zip
+            - ./aws/install
             - echo "$BITBUCKET_GIT_SSH_ORIGIN"
             - ssh -o StrictHostKeyChecking=no ubuntu@$STAGING_EC2_HOST "
                 if [ ! -d ~/staging ]; then
