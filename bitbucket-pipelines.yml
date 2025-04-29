@@ -13,25 +13,18 @@ pipelines:
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
             - pwd
-            - ls -la
             # Install AWS CLI
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip
             - ./aws/install
             - /usr/local/bin/aws --version
             - echo "$BITBUCKET_GIT_SSH_ORIGIN"
-            - ssh -o StrictHostKeyChecking=no ubuntu@$STAGING_EC2_HOST "
-                set -e
-                if [ ! -d ~/staging/.git ]; then
-                  rm -rf ~/staging
-                  git clone $BITBUCKET_GIT_SSH_ORIGIN staging
-                else
-                  cd staging
-                  git reset --hard
-                  git clean -fd
-                  git pull origin staging
-                fi
-              "
+            # Configure AWS credentials
+            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            - aws configure set default.region $AWS_REGION
+            - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .
+            - ls -la
 
 #             - ssh ec2-user@$STAGING_EC2_HOST "
 #                 cd app-staging;
