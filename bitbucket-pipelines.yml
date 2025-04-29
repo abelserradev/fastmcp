@@ -16,12 +16,18 @@ pipelines:
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip
             - ./aws/install
+            - /usr/local/bin/aws --version
             - echo "$BITBUCKET_GIT_SSH_ORIGIN"
             - ssh -o StrictHostKeyChecking=no ubuntu@$STAGING_EC2_HOST "
-                if [ ! -d ~/staging ]; then
-                  git clone $BITBUCKET_GIT_SSH_ORIGIN staging;
+                set -e
+                if [ ! -d ~/staging/.git ]; then
+                  rm -rf ~/staging
+                  git clone $BITBUCKET_GIT_SSH_ORIGIN staging
                 else
-                  cd staging && git pull origin staging;
+                  cd staging
+                  git reset --hard
+                  git clean -fd
+                  git pull origin staging
                 fi
               "
 
