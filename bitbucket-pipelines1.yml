@@ -2,32 +2,6 @@ image: atlassian/default-image:3
 
 pipelines:
   branches:
-    qa:
-      - step:
-          name: Deploy QA Environment
-          caches:
-            - docker
-          script:
-            - mkdir -p ~/.ssh
-            - echo "$QA_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            - chmod 600 ~/.ssh/id_rsa
-            - ssh-keyscan $QA_EC2_HOST >> ~/.ssh/known_hosts
-
-            - ssh -o StrictHostKeyChecking=no ec2-user@$QA_EC2_HOST "
-                if [ ! -d ~/app-qa ]; then
-                  git clone $BITBUCKET_GIT_SSH_ORIGIN app-qa;
-                else
-                  cd app-qa && git pull origin qa;
-                fi
-              "
-
-            - ssh ec2-user@$QA_EC2_HOST "
-                cd app-qa;
-                docker compose down || true;
-                docker compose build;
-                docker compose up -d;
-              "
-
     staging:
       - step:
           name: Deploy Staging Environment
@@ -39,43 +13,18 @@ pipelines:
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
 
-            - ssh -o StrictHostKeyChecking=no ec2-user@$STAGING_EC2_HOST "
-                if [ ! -d ~/app-staging ]; then
-                  git clone $BITBUCKET_GIT_SSH_ORIGIN app-staging;
-                else
-                  cd app-staging && git pull origin staging;
-                fi
-              "
+#             - ssh -o StrictHostKeyChecking=no ec2-user@$STAGING_EC2_HOST "
+#                 if [ ! -d ~/app-staging ]; then
+#                   git clone $BITBUCKET_GIT_SSH_ORIGIN app-staging;
+#                 else
+#                   cd app-staging && git pull origin staging;
+#                 fi
+#               "
 
-            - ssh ec2-user@$STAGING_EC2_HOST "
-                cd app-staging;
-                docker compose down || true;
-                docker compose build;
-                docker compose up -d;
-              "
+#             - ssh ec2-user@$STAGING_EC2_HOST "
+#                 cd app-staging;
+#                 docker compose down || true;
+#                 docker compose build;
+#                 docker compose up -d;
+#               "
 
-    production:
-      - step:
-          name: Deploy Production Environment
-          caches:
-            - docker
-          script:
-            - mkdir -p ~/.ssh
-            - echo "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            - chmod 600 ~/.ssh/id_rsa
-            - ssh-keyscan $PROD_EC2_HOST >> ~/.ssh/known_hosts
-
-            - ssh -o StrictHostKeyChecking=no ec2-user@$PROD_EC2_HOST "
-                if [ ! -d ~/app-prod ]; then
-                  git clone $BITBUCKET_GIT_SSH_ORIGIN app-prod;
-                else
-                  cd app-prod && git pull origin production;
-                fi
-              "
-
-            - ssh ec2-user@$PROD_EC2_HOST "
-                cd app-prod;
-                docker compose down || true;
-                docker compose build;
-                docker compose up -d;
-              "

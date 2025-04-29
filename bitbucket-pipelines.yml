@@ -12,7 +12,7 @@ pipelines:
             - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
             - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
-
+            - echo "$BITBUCKET_GIT_SSH_ORIGIN"
             - ssh -o StrictHostKeyChecking=no ubuntu@$STAGING_EC2_HOST "
                 if [ ! -d ~/staging ]; then
                   git clone $BITBUCKET_GIT_SSH_ORIGIN staging;
