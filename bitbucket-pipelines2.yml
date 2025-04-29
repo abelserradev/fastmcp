@@ -2,25 +2,11 @@ image: python:3.12
 
 pipelines:
   branches:
-    qa:
-      - step: *deploy-to-ec2-qa
     staging:
       - step: *deploy-to-ec2-staging
-    production:
-      - step: *deploy-to-ec2-production
 
 definitions:
   steps:
-    - step: &deploy-to-ec2-qa
-        name: Deploy to AWS EC2 (QA)
-        deployment: qa
-        script:
-          - *deploy-script-local-build
-        variables:
-          EC2_USER: $EC2_QA_USER
-          EC2_IP: $EC2_QA_IP
-          EC2_PRIVATE_KEY: $EC2_QA_PRIVATE_KEY
-          REMOTE_PATH: '/home/$EC2_QA_USER/app'
     - step: &deploy-to-ec2-staging
         name: Deploy to AWS EC2 (Staging)
         deployment: staging
@@ -31,16 +17,6 @@ definitions:
           EC2_IP: $EC2_STAGING_IP
           EC2_PRIVATE_KEY: $EC2_STAGING_PRIVATE_KEY
           REMOTE_PATH: '/home/$EC2_STAGING_USER/app'
-    - step: &deploy-to-ec2-production
-        name: Deploy to AWS EC2 (Production)
-        deployment: production
-        script:
-          - *deploy-script-local-build
-        variables:
-          EC2_USER: $EC2_PROD_USER
-          EC2_IP: $EC2_PROD_IP
-          EC2_PRIVATE_KEY: $EC2_PROD_PRIVATE_KEY
-          REMOTE_PATH: '/home/$EC2_PROD_USER/app'
 
   script: &deploy-script-local-build
     - echo "Deploying to AWS EC2 instance..."
@@ -65,7 +41,3 @@ definitions:
           docker-compose down
           docker-compose up -d --build --force-recreate # Construye la imagen y levanta los contenedores
     - echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"
-
-  services:
-    docker:
-      memory: 2048

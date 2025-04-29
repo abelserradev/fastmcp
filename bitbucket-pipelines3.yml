@@ -49,12 +49,6 @@ definitions:
 
 pipelines:
   branches:
-    qa:
-      - step: *build-test
-      - step:
-          <<: *deploy-to-ec2
-          name: Deploy to QA Environment
-          deployment: qa
 
     staging:
       - step: *build-test
@@ -63,26 +57,12 @@ pipelines:
           name: Deploy to Staging Environment
           deployment: staging
 
-    production:
-      - step: *build-test
-      - step:
-          <<: *deploy-to-ec2
-          name: Deploy to Production Environment
-          deployment: production
 
   pull-requests:
     '**':
       - step: *build-test
 
   custom:
-    manual-deploy-qa:
-      - step: *build-test
-      - step:
-          <<: *deploy-to-ec2
-          name: Manual Deploy to QA
-          deployment: qa
-          trigger: manual
-
     manual-deploy-staging:
       - step: *build-test
       - step:
@@ -91,10 +71,3 @@ pipelines:
           deployment: staging
           trigger: manual
 
-    manual-deploy-production:
-      - step: *build-test
-      - step:
-          <<: *deploy-to-ec2
-          name: Manual Deploy to Production
-          deployment: production
-          trigger: manual
