@@ -25,7 +25,7 @@ pipelines:
       - step:
           name: Run remote commands via ssh
           script:
-            - pipe: atlassian/ssh-run:1.2.0
+            - pipe: atlassian/ssh-run:0.4.4
               variables:
                 SSH_USER: $EC2_USER
                 SSH_HOST: $STAGING_EC2_HOST
