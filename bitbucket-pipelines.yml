@@ -22,14 +22,15 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
-      - step:
-          name: Run remote commands via ssh
-          script:
+#      - step:
+#          name: Run remote commands via ssh
+#          script:
             - pipe: atlassian/ssh-run:0.4.4
               variables:
                 SSH_USER: $EC2_USER
                 SSH_HOST: $STAGING_EC2_HOST
                 SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                MODE: 'script'
                 COMMAND: |
                   cd $REMOTE_PATH
                   docker-compose down
