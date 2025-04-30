@@ -27,6 +27,7 @@ pipelines:
           script:
             - pipe: atlassian/ssh-run:0.5.0
               variables:
+                SERVER: $STAGING_EC2_HOST
                 SSH_USER: $EC2_USER
                 SSH_HOST: $STAGING_EC2_HOST
                 SSH_KEY: $STAGING_SSH_PRIVATE_KEY
