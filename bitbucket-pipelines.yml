@@ -23,7 +23,7 @@ pipelines:
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
 #      - step:
-#          name: Deploy Staging Environment
+#          name: Deploy Develop Environment
 #          script:
 #            - pipe: atlassian/ssh-run:0.5.0
 #              variables:
