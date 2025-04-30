@@ -32,8 +32,8 @@ pipelines:
                 SSH_HOST: $STAGING_EC2_HOST
                 SSH_KEY: $STAGING_SSH_PRIVATE_KEY
                 MODE: 'command'
-                COMMAND: |
-                  ls -la
+                DEBUG: 'true'
+                COMMAND: "ls -la"
 #                  cd $REMOTE_PATH
 #                  docker compose down
 #                  docker compose -f docker-compose_test.yml up --build -d
