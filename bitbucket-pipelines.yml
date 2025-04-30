@@ -35,5 +35,5 @@ pipelines:
                 DEBUG: 'true'
                 COMMAND: |
                   cd $REMOTE_PATH
-                  docker compose -f docker-compose_test.yml down -v
-                  docker compose -f docker-compose_test.yml up --build -d
+                  docker compose -f docker-compose_staging.yml down -v
+                  docker compose -f docker-compose_staging.yml up --build -d
