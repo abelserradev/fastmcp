@@ -25,13 +25,13 @@ pipelines:
 #      - step:
 #          name: Run remote commands via ssh
 #          script:
-            - pipe: atlassian/ssh-run:0.4.4
-              variables:
-                SSH_USER: $EC2_USER
-                SSH_HOST: $STAGING_EC2_HOST
-                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-                MODE: 'script'
-                COMMAND: |
-                  cd $REMOTE_PATH
-                  docker-compose down
-                  docker-compose -f docker-compose_test.yml up --build -d --force-recreate
+#            - pipe: atlassian/ssh-run:0.4.4
+#              variables:
+#                SSH_USER: $EC2_USER
+#                SSH_HOST: $STAGING_EC2_HOST
+#                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+#                MODE: 'script'
+#                COMMAND: |
+#                  cd $REMOTE_PATH
+#                  docker-compose down
+#                  docker-compose -f docker-compose_test.yml up --build -d --force-recreate
