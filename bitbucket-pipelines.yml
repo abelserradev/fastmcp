@@ -22,21 +22,21 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
-#      - step:
-#          name: Deploy Develop Environment
-#          script:
-#            - pipe: atlassian/ssh-run:0.5.0
-#              variables:
-#                SERVER: $STAGING_EC2_HOST
-#                SSH_USER: $EC2_USER
-#                SSH_HOST: $STAGING_EC2_HOST
-#                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-#                MODE: 'command'
-#                DEBUG: 'true'
-#                COMMAND: |
-#                  cd $REMOTE_PATH_DEVELOP
-#                  docker compose -f docker-compose_test.yml down -v
-#                  docker compose -f docker-compose_test.yml up --build -d
+      - step:
+          name: Deploy Develop Environment
+          script:
+            - pipe: atlassian/ssh-run:0.5.0
+              variables:
+                SERVER: $STAGING_EC2_HOST
+                SSH_USER: $EC2_USER
+                SSH_HOST: $STAGING_EC2_HOST
+                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                MODE: 'command'
+                DEBUG: 'true'
+                COMMAND: |
+                  cd $REMOTE_PATH_DEVELOP
+                  docker compose -f docker-compose_test.yml down -v
+                  docker compose -f docker-compose_test.yml up --build -d
     staging:
       - step:
           name: Setup Staging Environment
