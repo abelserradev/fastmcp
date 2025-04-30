@@ -28,14 +28,14 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
-            - echo "Step: Building and running Docker Compose on EC2 instance..."
-            - pipe: atlassian/ssh-run:1.2.0
-              variables:
-                  SSH_USER: $EC2_USER
-                  SSH_HOST: $STAGING_EC2_HOST
-                  SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-                  COMMAND: |
-                    cd $REMOTE_PATH
-                    docker-compose down
-                    docker compose  -f docker-compose_staging.yml up --build -d --force-recreate
+#            - echo "Step: Building and running Docker Compose on EC2 instance..."
+#            - pipe: atlassian/ssh-run:1.2.0
+#              variables:
+#                  SSH_USER: $EC2_USER
+#                  SSH_HOST: $STAGING_EC2_HOST
+#                  SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+#                  COMMAND: |
+#                    cd $REMOTE_PATH
+#                    docker-compose down
+#                    docker compose  -f docker-compose_staging.yml up --build -d --force-recreate
             - echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"
