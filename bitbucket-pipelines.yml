@@ -5,39 +5,36 @@ pipelines:
     staging:
       - step:
           name: Deploy Staging Environment
-#           caches:
-#             - docker
           script:
-            - echo "Step: Add ssh private key"
-            - mkdir -p ~/.ssh
-            - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            - chmod 600 ~/.ssh/id_rsa
-            - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
-            # Install AWS CLI
-            - echo "Step: Install AWS CLI"
-            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            - unzip awscliv2.zip
-            - ./aws/install
-            - /usr/local/bin/aws --version
-            - rm awscliv2.zip
-            - echo "Step: Configure AWS credentials"
-            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            - aws configure set default.region $AWS_REGION
-            - echo "Step: Pull .env file for staging"
-            - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .
-            - echo "Step: scp  from repo to remote host"
-            - apt-get update && apt-get install -y openssh-client
-            - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
-            - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
-            - echo "Step: Building and running Docker Compose on EC2 instance..."
+            - 'echo "Step: Add ssh private key"'
+            - 'mkdir -p ~/.ssh'
+            - 'echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa'
+            - 'chmod 600 ~/.ssh/id_rsa'
+            - 'ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts'
+            - 'echo "Step: Install AWS CLI"'
+            - 'curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"'
+            - 'unzip awscliv2.zip'
+            - './aws/install'
+            - '/usr/local/bin/aws --version'
+            - 'rm awscliv2.zip'
+            - 'echo "Step: Configure AWS credentials"'
+            - 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
+            - 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
+            - 'aws configure set default.region $AWS_REGION'
+            - 'echo "Step: Pull .env file for staging"'
+            - 'aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .'
+            - 'echo "Step: scp from repo to remote host"'
+            - 'apt-get update && apt-get install -y openssh-client'
+            - 'scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/'
+            - 'scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/'
+            - 'echo "Step: Building and running Docker Compose on EC2 instance..."'
             - pipe: atlassian/ssh-run:1.2.0
               variables:
-                  SSH_USER: $EC2_USER
-                  SSH_HOST: $STAGING_EC2_HOST
-                  SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-                  COMMAND: |
-                    cd $REMOTE_PATH
-                    docker-compose down
-                    docker compose  -f docker-compose_staging.yml up --build -d --force-recreate
-            - echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"
+                SSH_USER: $EC2_USER
+                SSH_HOST: $STAGING_EC2_HOST
+                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                COMMAND: |
+                  cd $REMOTE_PATH
+                  docker-compose down
+                  docker compose -f docker-compose_staging.yml up --build -d --force-recreate
+            - 'echo "FastAPI application deployed successfully on $BITBUCKET_DEPLOYMENT_ENVIRONMENT!"'
