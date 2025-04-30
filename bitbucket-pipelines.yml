@@ -6,7 +6,7 @@ pipelines:
       - step:
           name: Deploy Staging Environment
           script:
-            - echo "Step 1: Add ssh private key"
+#            - echo "Step 1: Add ssh private key"
             - mkdir -p ~/.ssh
             - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             - chmod 600 ~/.ssh/id_rsa
@@ -17,13 +17,13 @@ pipelines:
             - ./aws/install
             - /usr/local/bin/aws --version
             - rm awscliv2.zip
-            - echo "Step 1: Configure AWS credentials"
+#            - echo "Step 1: Configure AWS credentials"
             - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             - aws configure set default.region $AWS_REGION
-            - echo "Step 1: Pull .env file"
+#            - echo "Step 1: Pull .env file"
             - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/staging/.env .
-            - echo "Step 1: Scp push files to remote host"
+#            - echo "Step 1: Scp push files to remote host"
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
