@@ -33,6 +33,7 @@ pipelines:
                 SSH_KEY: $STAGING_SSH_PRIVATE_KEY
                 MODE: 'command'
                 COMMAND: |
-                  cd $REMOTE_PATH
-                  docker compose down
-                  docker compose -f docker-compose_test.yml up --build -d
+                  ls -la
+#                  cd $REMOTE_PATH
+#                  docker compose down
+#                  docker compose -f docker-compose_test.yml up --build -d
