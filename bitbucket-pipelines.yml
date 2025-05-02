@@ -2,6 +2,41 @@ image: atlassian/default-image:3
 
 pipelines:
   branches:
+    main:
+      - step:
+          name: Setup Production Environment
+          script:
+            - mkdir -p ~/.ssh
+            - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            - chmod 600 ~/.ssh/id_rsa
+            - ssh-keyscan $PROD_EC2_HOST >> ~/.ssh/known_hosts
+            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            - unzip awscliv2.zip
+            - ./aws/install
+            - /usr/local/bin/aws --version
+            - rm awscliv2.zip
+            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            - aws configure set default.region $AWS_REGION
+            - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/prod/.env .
+            - apt-get update && apt-get install -y openssh-client
+            - scp -r * $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
+            - scp .env $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
+      - step:
+          name: Deploy Production Environment
+          script:
+            - pipe: atlassian/ssh-run:0.5.0
+              variables:
+                SERVER: $PROD_EC2_HOST
+                SSH_USER: $EC2_USER
+                SSH_HOST: $PROD_EC2_HOST
+                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                MODE: 'command'
+                DEBUG: 'true'
+                COMMAND: |
+                  cd $REMOTE_PATH_PROD
+                  docker compose -f docker-compose.yml down -v
+                  docker compose -f docker-compose.yml up --build -d
     develop:
       - step:
           name: Setup Develop Environment
