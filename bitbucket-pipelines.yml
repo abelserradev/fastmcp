@@ -2,7 +2,7 @@ image: atlassian/default-image:3
 
 pipelines:
   branches:
-    prod_cicd:
+    main:
       - step:
           name: Setup Production Environment
           script:
@@ -35,10 +35,10 @@ pipelines:
                 DEBUG: 'true'
                 COMMAND: |
                   cd $REMOTE_PATH_PROD
-                  docker compose -f docker-compose_staging.yml down -v
-                  docker compose -f docker-compose_staging.yml up --build -d
-#                  docker compose -f docker-compose.yml down -v
-#                  docker compose -f docker-compose.yml up --build -d
+#                  docker compose -f docker-compose_staging.yml down -v
+#                  docker compose -f docker-compose_staging.yml up --build -d
+                  docker compose -f docker-compose.yml down -v
+                  docker compose -f docker-compose.yml up --build -d
 
     develop:
       - step:
