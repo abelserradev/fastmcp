@@ -177,15 +177,23 @@ def registrar_pago(
 
     if response.status_code != 200:
 
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
 
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     # # Convierte la respuesta en JSON
@@ -271,6 +279,9 @@ def otp_mbu(
         return datos
 
     try:
+        logger.info(f"URL: {url_otp_mbu}")
+        logger.info(f"Headers: {headers_pasarela_ms}")
+        logger.info(f"Payload: {json.dumps*payload}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
             url_otp_mbu,
@@ -280,6 +291,7 @@ def otp_mbu(
         )
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno del servidor",
@@ -299,16 +311,25 @@ def otp_mbu(
 
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     resp = response.json()
 
     if resp["status"]["code"] != "EXITO":
-        logger.error(f"{resp["status"]["description"]}")
+
+        try:
+            detail = f"{resp["status"]["description"]}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=f"{resp["status"]["description"]}")
+                            detail=detail)
 
 
     return resp["datos"]
@@ -390,16 +411,24 @@ def consulta_tasa_bcv(
         )
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     resp = response.json()
 
     if resp["status"]["code"] != "EXITO":
-        logger.error(f"{resp["status"]["description"]}")
+        try:
+            detail = f"{resp["status"]["description"]}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=f"{resp["status"]["description"]}")
+                            detail=detail)
 
     return resp["tasa"][0]
 
@@ -507,15 +536,15 @@ def notificacion_pago(
 
     if response.status_code != 200:
 
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()}")
+                            detail=f"{response.text}")
 
     if response.json()["status"]["code"] != "EXITO":
 
-        logger.error(f"{response.json()}")
+        logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()} ")
+                            detail=f"{response.text} ")
 
 
     # # Convierte la respuesta en JSON
