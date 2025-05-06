@@ -2,7 +2,7 @@ image: atlassian/default-image:3
 
 pipelines:
   branches:
-    main:
+    prod_cicd:
       - step:
           name: Setup Production Environment
           script:
@@ -22,21 +22,21 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
             - scp .env $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
-      - step:
-          name: Deploy Production Environment
-          script:
-            - pipe: atlassian/ssh-run:0.5.0
-              variables:
-                SERVER: $PROD_EC2_HOST
-                SSH_USER: $EC2_USER
-                SSH_HOST: $PROD_EC2_HOST
-                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
-                MODE: 'command'
-                DEBUG: 'true'
-                COMMAND: |
-                  cd $REMOTE_PATH_PROD
-                  docker compose -f docker-compose.yml down -v
-                  docker compose -f docker-compose.yml up --build -d
+#      - step:
+#          name: Deploy Production Environment
+#          script:
+#            - pipe: atlassian/ssh-run:0.5.0
+#              variables:
+#                SERVER: $PROD_EC2_HOST
+#                SSH_USER: $EC2_USER
+#                SSH_HOST: $PROD_EC2_HOST
+#                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+#                MODE: 'command'
+#                DEBUG: 'true'
+#                COMMAND: |
+#                  cd $REMOTE_PATH_PROD
+#                  docker compose -f docker-compose.yml down -v
+#                  docker compose -f docker-compose.yml up --build -d
     develop:
       - step:
           name: Setup Develop Environment
