@@ -109,14 +109,21 @@ async def consultar_persona(
 
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
-        raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
+        raise HTTPException(status_code=response.status_code, detail=detail)
 
 
     # Convierte la respuesta en JSON
@@ -188,7 +195,6 @@ def crear_persona(
 
 
     try:
-
         response = sync_fetch_url(
             "POST",
             url_crear_persona,
@@ -215,14 +221,22 @@ def crear_persona(
         )
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     # convertir response to JSON
@@ -304,9 +318,7 @@ async def crear_cotizacion(
         )
 
     try:
-        logger.info(f"URL: {url_crear_cotizacion}")
-        logger.info(f"headers: {headers}")
-        logger.info(f"Body: {body}")
+        logger.info(f"Payload: {json.dumps(body)}")
         response = await fetch_url(
             "POST",
             url_crear_cotizacion,
@@ -333,14 +345,22 @@ async def crear_cotizacion(
         )
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
 
@@ -384,7 +404,7 @@ async def emitir_poliza(
         )
 
     try:
-
+        logger.info(f"Payload: {json.dumps(body)}")
         response = await fetch_url(
             "POST",
             url_emitir_poliza,
@@ -412,14 +432,22 @@ async def emitir_poliza(
         )
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     response_json = response.json()
@@ -503,18 +531,31 @@ async def consultar_poliza(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
+
     elif response.json()["status"]["code"] == "EXITO" and response.json()["status"]['descripcion'] == 'No se ha encontrado informacion para los criterios de busqueda indicados.':
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     response_json = response.json()
@@ -599,14 +640,22 @@ async def incluir_anexo(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
 
@@ -690,14 +739,23 @@ async def consultar_recibos(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
 
