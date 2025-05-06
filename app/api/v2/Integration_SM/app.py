@@ -150,14 +150,22 @@ async def crear_cotizacion(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     # convertir response to JSON
@@ -225,14 +233,22 @@ async def get_cuadro_poliza(
     response_json = response.json()
 
     if response.status_code != 200:
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response_json['status']['code']} {response_json['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response_json['status']['code']} {response_json['status']['descripcion']}")
+                            detail=detail)
 
 
 
@@ -303,10 +319,14 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
 
 
     if response.status_code == 200 and len(response_json["mensajes"]) > 0:
-        logger.error(response_json["mensajes"][0]["mensaje"])
+        try:
+            detail = response_json["mensajes"][0]["mensaje"]
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=response_json["mensajes"][0]["mensaje"],
+            detail=detail,
         )
     if response.status_code != 200:
         logger.error(f"{response_json}")
@@ -413,14 +433,22 @@ def emitir_poliza(
         )
 
     if response.status_code != 200:
-        # logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.json()}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.json()['status']['code']} {response.json()['status']['descripcion']}")
+                            detail=detail)
 
 
     response_json = response.json()

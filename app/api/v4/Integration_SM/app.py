@@ -249,14 +249,22 @@ def crear_cotizacion(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.text} ")
+                            detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        logger.error(f"{response.text}")
+        try:
+            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        except KeyError:
+            detail = f"{response.text}"
+        logger.error(detail)
         raise HTTPException(status_code=response.status_code,
-                            detail=f"{response.text} ")
+                            detail=detail)
 
     # convertir response to JSON
     response_json = response.json()
