@@ -37,6 +37,7 @@ pipelines:
                   cd $REMOTE_PATH_PROD
                   docker compose -f docker-compose.yml down -v
                   docker compose -f docker-compose.yml up --build -d
+
     develop:
       - step:
           name: Setup Develop Environment
