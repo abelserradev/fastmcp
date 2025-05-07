@@ -20,6 +20,35 @@ from app.utils.v1.constants import (
 
 
 def main():
+    """
+    Main function to initialize and start the server.
+
+    This function logs server environment details and settings URLs for different services.
+    It then starts the server in the configured environment mode. For production and staging
+    environments, the server runs with no reload and multiple workers. For other environments,
+    the server runs with the reload option enabled.
+
+    Attributes:
+        ENV (str): The current environment of the server (e.g., production, staging,
+            development).
+        url_consult_persona (str): The URL to consult person data.
+        url_crear_persona (str): The URL to create person data.
+        url_crear_cotizacion (str): The URL to create a quotation.
+        url_emitir_poliza (str): The URL to issue a policy.
+        url_inclusion_anexos_poliza (str): The URL for the inclusion of policy annexes.
+        url_cotizar (str): The URL to perform a quotation.
+        url_consultar_cotizacion (str): The URL to consult quotations.
+        url_registrar_pago (str): The URL to register payments.
+        url_otp_mbu (str): The URL to generate OTPs.
+        url_notificacion_pago (str): The URL to notify payments.
+        url_suscripcion_tasa_bcv (str): The URL to consult BCV rates.
+        url_cuadro_poliza (str): The URL to generate a policy overview.
+
+    Raises:
+        Exception: If any error occurs during server initialization or while starting
+            the server.
+
+    """
     logger.info("Server started")
     logger.info(f"Environment: {ENV}")
     logger.info("Loading settings")
