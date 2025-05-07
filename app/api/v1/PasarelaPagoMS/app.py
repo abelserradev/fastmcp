@@ -246,7 +246,7 @@ def otp_mbu(
 
     instrumento = data.get("instrumento")
     payload = payload_pasarela_otp.copy()
-    payload["datos"]["tipo_instrumento"] = tipo_instrumento
+    payload["datos"]["tipo_instrumento_pago"] = tipo_instrumento
 
     match tipo_instrumento:
         case "C2P":
@@ -281,7 +281,7 @@ def otp_mbu(
     try:
         logger.info(f"URL: {url_otp_mbu}")
         logger.info(f"Headers: {headers_pasarela_ms}")
-        logger.info(f"Payload: {json.dumps*payload}")
+        logger.info(f"Payload: {json.dumps(payload)}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
             url_otp_mbu,
