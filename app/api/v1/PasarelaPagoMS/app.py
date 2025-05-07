@@ -246,7 +246,7 @@ def otp_mbu(
 
     instrumento = data.get("instrumento")
     payload = payload_pasarela_otp.copy()
-    payload["datos"]["tipo_instrumento"] = tipo_instrumento
+    payload["datos"]["tipo_instrumento_pago"] = tipo_instrumento
 
     match tipo_instrumento:
         case "C2P":
