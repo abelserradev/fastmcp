@@ -206,9 +206,9 @@ def registrar_pago(
 
 @router.post(
     "/otp_mbu",
-    response_model=ResponseOTPMBU,
+    # response_model=ResponseOTPMBU,
     status_code=status.HTTP_200_OK,
-    summary="Registrar Pago Pasarela MS",
+    summary="Generar OTP Banco Mercantil",
 )
 def otp_mbu(
     request: OtpMbuBase,
@@ -331,7 +331,7 @@ def otp_mbu(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=detail)
 
-
+    logger.info(f"Response: {resp}")
     return resp["datos"]
 
 
@@ -430,7 +430,7 @@ def consulta_tasa_bcv(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=detail)
 
-    logger.info(resp)
+
     return resp["tasa"][0]
 
 
