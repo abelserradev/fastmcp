@@ -243,3 +243,14 @@ payload_tasa_bcv = {
         "cd_moneda":2,
     }
 }
+
+
+
+payload_notificacion_pago = {
+    "aplicacion": "API_PAGO",
+    "funcionalidad": "NOTIFICAR_PAGO_EXTERNO",
+    "usuario": USER,
+    "datos" : {
+        "mid": MID
+    }
+}
