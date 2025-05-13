@@ -20,6 +20,16 @@ app = FastAPI(
 configure_middleware(app)
 
 
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """
+    Health check endpoint to verify the API is running.
+
+    Returns:
+        dict: A dictionary with a status message.
+    """
+    return {"status": "ok"}
+
 
 app.include_router(api_router_v1, prefix="/api/v1/sm")
 app.include_router(api_router_v2, prefix="/api/v2/sm")
