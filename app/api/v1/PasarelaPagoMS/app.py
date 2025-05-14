@@ -199,6 +199,7 @@ def registrar_pago(
     # # Convierte la respuesta en JSON
     response_json = response.json()
     result = response_json.get("datos")
+    logger.info(json.dumps(result))
     return result
 
 
