@@ -80,7 +80,7 @@ def registrar_pago(
     match tipo_instrumento_pago:
         case "C2P":
             instrumento_c2p = instrumento_pago.get("instrumento_c2p")
-            instrumento["numero"] = instrumento_c2p.get("numero")
+            # instrumento["numero"] = instrumento_c2p.get("numero")
             instrumento["tp_identidad"] = instrumento_c2p.get("tp_identidad")
             instrumento["doc_identidad"] = instrumento_c2p.get("doc_identidad")
             instrumento["nu_telefono"] = instrumento_c2p.get("nu_telefono")

@@ -379,7 +379,7 @@ class TipoInstrumentoPagoEnum(Enum):
 
 class InstrumentoC2PBase(BaseModel):
 
-    numero: int
+    #numero: int
     tp_identidad: str = Field(..., pattern=r"^[VE]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
     nu_telefono: str = Field(...,
