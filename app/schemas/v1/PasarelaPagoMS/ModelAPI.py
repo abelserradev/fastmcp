@@ -394,7 +394,7 @@ class InstrumentoTDCBase(BaseModel):
     fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
+    tp_identidad: str = Field(..., pattern=r"^[VE]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
 
 class TPCuentaEnum(Enum):
