@@ -108,3 +108,60 @@ pipelines:
                   cd $REMOTE_PATH_STAGING
                   docker compose -f docker-compose_staging.yml down -v
                   docker compose -f docker-compose_staging.yml up --build -d
+    feature/*:
+      - step:
+          name: Setup Feature Environment
+          script:
+            # Setup SSH access
+            - mkdir -p ~/.ssh
+            - echo "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            - chmod 600 ~/.ssh/id_rsa
+            - ssh-keyscan $STAGING_EC2_HOST >> ~/.ssh/known_hosts
+
+            # Install AWS CLI
+            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            - unzip awscliv2.zip
+            - ./aws/install
+            - /usr/local/bin/aws --version
+            - rm awscliv2.zip
+
+            # Configure AWS credentials
+            - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            - aws configure set default.region $AWS_REGION
+
+            # Download environment file from S3 (using develop environment for features)
+            - aws s3 cp s3://devops-asistensi/CuidaSalud/integracionMS/develop/.env .
+
+            # Convert branch name to directory-friendly format (replace / with -)
+            - export BRANCH_NAME=$(echo $BITBUCKET_BRANCH | sed 's/\//-/g')
+
+            # Install SSH client, create directory on server, and copy files
+            - apt-get update && apt-get install -y openssh-client
+            - ssh $EC2_USER@$STAGING_EC2_HOST "mkdir -p /home/$EC2_USER/features/$BRANCH_NAME/"
+            - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/$BRANCH_NAME/
+            - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/$BRANCH_NAME/
+
+      - step:
+          name: Deploy Feature Environment
+          script:
+            # Convert branch name to directory-friendly format (replace / with -)
+            - export BRANCH_NAME=$(echo $BITBUCKET_BRANCH | sed 's/\//-/g')
+
+            # Run deployment commands on the remote server
+            - pipe: atlassian/ssh-run:0.5.0
+              variables:
+                SERVER: $STAGING_EC2_HOST
+                SSH_USER: $EC2_USER
+                SSH_HOST: $STAGING_EC2_HOST
+                SSH_KEY: $STAGING_SSH_PRIVATE_KEY
+                MODE: 'command'
+                DEBUG: 'true'
+                COMMAND: |
+                  # Convert branch name to directory-friendly format (replace / with -)
+                  export BRANCH_NAME=$(echo $BITBUCKET_BRANCH | sed 's/\//-/g')
+
+                  # Navigate to feature branch directory and deploy
+                  cd /home/$EC2_USER/features/$BRANCH_NAME
+                  docker compose -f docker-compose_test.yml down -v
+                  docker compose -f docker-compose_test.yml up --build -d
