@@ -380,7 +380,7 @@ class TipoInstrumentoPagoEnum(Enum):
 class InstrumentoC2PBase(BaseModel):
 
     #numero: int
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
     nu_telefono: str = Field(...,
                              pattern=r"^58(412|414|416|424|426)\d{7}$",
@@ -394,7 +394,7 @@ class InstrumentoTDCBase(BaseModel):
     fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
 
 class TPCuentaEnum(Enum):
@@ -407,7 +407,7 @@ class InstrumentoTDDBase(BaseModel):
     fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
     tp_cuenta: TPCuentaEnum
     otp: str
