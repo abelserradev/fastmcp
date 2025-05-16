@@ -444,7 +444,7 @@ class InstrumentoC2PMnuEnum(Enum):
 
 class InstrumentoModel(BaseModel):
     tp_identidad: str = Field(..., pattern=r"^[VE]$", description="Cédula de identidad comienza con V o E, de venezolano o extranjero")
-    doc_identidad: str = Field(..., pattern=r"\d{5,10}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
+    doc_identidad: str = Field(..., pattern=r"\d{5,30}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
     nu_telefono: str = Field(...,
                              pattern=r"^58(412|414|416|424|426)\d{7}$",
                              description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
