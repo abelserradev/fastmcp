@@ -164,4 +164,4 @@ pipelines:
                   # Navigate to feature branch directory and deploy 
                   cd /home/$EC2_USER/features/$BRANCH_NAME
                   docker compose -f docker-compose_test.yml down -v
-                  docker compose -f docker-compose_test.yml up --build -d
+                  docker compose -p feature_${BRANCH_NAME} -f docker-compose_test.yml up --build -d
