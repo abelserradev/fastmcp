@@ -1,0 +1,21 @@
+
+services:
+  integration_sm_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Caracas
+    ports:
+      - "9000:9000"
+    networks:
+      - feature_branch
+    restart: always
+
+
+
+networks:
+  feature_branch:
+    driver: bridge
