@@ -8,6 +8,7 @@ services:
       - .env
     environment:
       - TZ=America/Caracas
+    container_name: feature_branch
     ports:
       - "9150:9000"
     networks:
