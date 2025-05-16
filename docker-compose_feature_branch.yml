@@ -9,7 +9,7 @@ services:
     environment:
       - TZ=America/Caracas
     ports:
-      - "9000:9000"
+      - "9150:9000"
     networks:
       - feature_branch
     restart: always
