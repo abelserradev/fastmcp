@@ -160,8 +160,8 @@ pipelines:
                 COMMAND: |
                   # Convert branch name to directory-friendly format (replace / with -)
                   export BRANCH_NAME=$(echo $BITBUCKET_BRANCH | sed 's/\//-/g')
-
-                  # Navigate to feature branch directory and deploy
+                  export COMPOSE_PROJECT_NAME=feature_${BRANCH_NAME}
+                  # Navigate to feature branch directory and deploy 
                   cd /home/$EC2_USER/features/$BRANCH_NAME
                   docker compose -f docker-compose_test.yml down -v
                   docker compose -f docker-compose_test.yml up --build -d
