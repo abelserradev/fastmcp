@@ -432,9 +432,12 @@ def emitir_poliza(
             detail=f"{e}",
         )
 
+    logger.info(response.text)
+    logger.info(response.status_code)
+
     if response.status_code != 200:
         try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+            detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
         except KeyError:
             detail = f"{response.text}"
         logger.error(detail)
@@ -443,7 +446,7 @@ def emitir_poliza(
 
     if response.json()["status"]["code"] != "EXITO":
         try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+            detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
         except KeyError:
             detail = f"{response.text}"
         logger.error(detail)
