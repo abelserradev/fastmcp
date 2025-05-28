@@ -488,3 +488,5 @@ payload.json
 peticion.json
 aws/
 .env
+.junie/guidelines.md
+.pre-commit-config.yaml
