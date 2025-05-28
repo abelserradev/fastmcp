@@ -486,4 +486,5 @@ poetry.lock
 prueba.json
 payload.json
 peticion.json
-
+aws/
+.env
