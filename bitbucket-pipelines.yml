@@ -22,7 +22,8 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
             - scp -r .git $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
-            - scp -r .* $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
+            - scp .dockerignore $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
+            - scp .gitignore $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
             - scp .env $EC2_USER@$PROD_EC2_HOST:/home/$EC2_USER/prod/integration-seguros-mercantil/
       - step:
           name: Deploy Production Environment
@@ -60,7 +61,8 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
             - scp -r .git $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
-            - scp -r .* $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
+            - scp .dockerignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
+            - scp .gitignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/develop/
       - step:
           name: Deploy Develop Environment
@@ -98,7 +100,8 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
             - scp -r .git $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
-            - scp -r .* $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
+            - scp .dockerignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
+            - scp .gitignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/staging/
       - step:
           name: Deploy Staging Environment
@@ -147,7 +150,8 @@ pipelines:
             - apt-get update && apt-get install -y openssh-client
             - scp -r * $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
             - scp -r .git $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
-            - scp -r .* $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
+            - scp .dockerignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
+            - scp .gitignore $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
             - scp .env $EC2_USER@$STAGING_EC2_HOST:/home/$EC2_USER/features/
 
       - step:
