@@ -20,7 +20,7 @@ def configure_middleware(app):
     # Los middlewares personalizados
     #app.add_middleware(middlewares.ErrorHandlingMiddleware)
     #app.add_middleware(middlewares.LoggingMiddleware)
-    app.add_middleware(middlewares.ProcessTimeHeaderMiddleware)
+    # app.add_middleware(middlewares.ProcessTimeHeaderMiddleware)
     # if ENV in ["production", "staging"]:
         # app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOST)
         #app.add_middleware(HTTPSRedirectMiddleware)
