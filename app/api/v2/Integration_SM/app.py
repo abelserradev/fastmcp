@@ -67,7 +67,7 @@ async def crear_cotizacion(
 
 
         fecha_nacimiento = data["persona"]["fecha_nacimiento"]
-        suma_poliza = SUMA_ASEGURADA
+
         fe_desde = data["poliza"]["fe_desde"]
         fe_hasta = data["poliza"]["fe_hasta"]
         cd_plan_pago = frecuencia_cuota[data["poliza"]["frecuencia_cuota"].value]
@@ -100,8 +100,7 @@ async def crear_cotizacion(
         coll_datos = {"datos": []}
 
         for item in body["coll_datos"]["datos"]:
-            # if item["cd_dato"] == 990150:
-            #     item["valor"] = suma_poliza
+
             if item["cd_dato"] == "710037":
                 item["valor"] = fecha_nacimiento
             if item["cd_dato"] == "710036":
@@ -179,7 +178,6 @@ async def crear_cotizacion(
 
 @router.post(
     "/cuadro_poliza",
-    #response_class=FileResponse,
     response_model=CuadroPolizaResponse,
     status_code=status.HTTP_200_OK,
     summary="Devuelve pdf con el cuadro de póliza",
@@ -252,11 +250,6 @@ async def get_cuadro_poliza(
 
 
 
-
-
-    # pdf_stream = BytesIO(base64.b64decode(reporte_codificado))
-    # pdf_stream = BytesIO(reporte_codificado)
-
     reporte_codificado = response_json["reporte_codificado"]
     response = {
         "status": {
@@ -294,7 +287,7 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
             headers,
             body
         )
-        response_json = response.json()
+
     except httpx.RequestError as e:
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
@@ -314,62 +307,69 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
             detail=f"{e}",
         )
 
-
-
-
-
-    if response.status_code == 200 and len(response_json["mensajes"]) > 0:
-        try:
-            detail = response_json["mensajes"][0]["mensaje"]
-        except KeyError:
-            detail = f"{response.text}"
-        logger.error(detail)
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=detail,
-        )
     if response.status_code != 200:
-        logger.error(f"{response_json}")
+        logger.error(f"{response.text}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Error: {response_json}"
+            detail=f"Error: {response.text}"
+        )
+
+    try:
+        response_json = response.json()
+        if response.status_code == 200 and len(response_json["mensajes"]) > 0:
+            # try:
+            #     detail = response_json["mensajes"][0]["mensaje"]
+            # except KeyError:
+            detail = f"{response.text}"
+            logger.error(detail)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=detail,
+            )
+
+        cotizacion = response_json["cotizacion"][0]
+        bienes = []
+        for bien in response_json["cotizacion"][0]["bienes"]:
+            temp = bien.copy()
+            del (
+                temp["fe_fallecimiento"],
+                temp["datos"],
+                temp["fe_exclusion"],
+                temp["preguntas"],
+                temp["nu_consec_tp_doc_asegurado"],
+            )
+            bienes.append(temp)
+
+        response_data = {
+            "de_plan_pago": cotizacion["de_plan_pago"],
+            "fe_desde": cotizacion["fe_desde"],
+            "fe_hasta": cotizacion["fe_hasta"],
+            "cd_entidad": cotizacion["cd_entidad"],
+            "nu_cotizacion": cotizacion["nu_cotizacion"],
+            "nu_documento_contratante": cotizacion["nu_documento_contratante"],
+            "tp_documento_contratante": cotizacion["tp_documento_contratante"],
+            "nu_documento": cotizacion["nu_documento"],
+            "tp_documento": cotizacion["tp_documento"],
+            "nu_poliza": cotizacion["nu_poliza"],
+            "mt_prima_total": cotizacion["mt_prima_total"],
+            "cd_region": cotizacion["cd_region"],
+            "nu_total_cuota": cotizacion["nu_total_cuota"],
+            "cd_area": cotizacion["cd_area"],
+            "nm_cliente": cotizacion["nm_cliente"],
+            "de_st_cotizacion": cotizacion["de_st_cotizacion"],
+            "bienes": bienes,
+        }
+        logger.info(f"Response: {response_data}")
+        return response_data
+
+    except json.JSONDecodeError as e:
+        logger.error(f"Error: {response.text}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al decodificar la respuesta JSON: {e}: {response.text}",
         )
 
 
-    cotizacion = response_json["cotizacion"][0]
-    bienes = []
-    for bien in response_json["cotizacion"][0]["bienes"]:
-        temp = bien.copy()
-        del(temp["fe_fallecimiento"],
-            temp["datos"],
-            temp["fe_exclusion"],
-            temp["preguntas"],
-            temp["nu_consec_tp_doc_asegurado"]
-            )
-        bienes.append(temp)
-
-
-    response_data = {
-        "de_plan_pago": cotizacion["de_plan_pago"],
-        "fe_desde": cotizacion["fe_desde"],
-        "fe_hasta": cotizacion["fe_hasta"],
-        "cd_entidad": cotizacion["cd_entidad"],
-        "nu_cotizacion": cotizacion["nu_cotizacion"],
-        "nu_documento_contratante": cotizacion["nu_documento_contratante"],
-        "tp_documento_contratante": cotizacion["tp_documento_contratante"],
-        "nu_documento": cotizacion["nu_documento"],
-        "tp_documento": cotizacion["tp_documento"],
-        "nu_poliza": cotizacion["nu_poliza"],
-        "mt_prima_total": cotizacion["mt_prima_total"],
-        "cd_region": cotizacion["cd_region"],
-        "nu_total_cuota": cotizacion["nu_total_cuota"],
-        "cd_area": cotizacion["cd_area"],
-        "nm_cliente": cotizacion["nm_cliente"],
-        "de_st_cotizacion": cotizacion["de_st_cotizacion"],
-        "bienes": bienes
-    }
-    logger.info(f"Response: {response_data}")
-    return response_data
 
 
 
