@@ -362,8 +362,8 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
         logger.info(f"Response: {response_data}")
         return response_data
 
-
     except json.JSONDecodeError as e:
+        logger.error(f"Error: {response.text}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al decodificar la respuesta JSON: {e}: {response.text}",
