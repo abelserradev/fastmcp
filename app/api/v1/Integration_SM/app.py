@@ -118,10 +118,10 @@ async def consultar_persona(
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        # try:
+        #     detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
+        # except KeyError:
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code, detail=detail)
 
