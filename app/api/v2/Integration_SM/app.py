@@ -436,19 +436,19 @@ def emitir_poliza(
     logger.info(response.status_code)
 
     if response.status_code != 200:
-        try:
-            detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        # try:
+        #     detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
+        # except KeyError:
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        # try:
+        #     detail = f"Codigo: {response.json()['status']['code']}, Mensaje:{response.json()['mensajes'][0]['mensaje']}, Descripción: {response.json()['status']['descripcion']}"
+        # except KeyError:
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
