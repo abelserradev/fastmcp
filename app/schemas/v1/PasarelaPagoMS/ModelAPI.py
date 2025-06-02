@@ -379,8 +379,8 @@ class TipoInstrumentoPagoEnum(Enum):
 
 class InstrumentoC2PBase(BaseModel):
 
-    numero: int
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
+    #numero: int
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
     nu_telefono: str = Field(...,
                              pattern=r"^58(412|414|416|424|426)\d{7}$",
@@ -407,7 +407,7 @@ class InstrumentoTDDBase(BaseModel):
     fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
     doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
     tp_cuenta: TPCuentaEnum
     otp: str
@@ -443,8 +443,8 @@ class InstrumentoC2PMnuEnum(Enum):
     TDD = "TDD"
 
 class InstrumentoModel(BaseModel):
-    tp_identidad: str = Field(..., pattern=r"^[VE]$", description="Cédula de identidad comienza con V o E, de venezolano o extranjero")
-    doc_identidad: str = Field(..., pattern=r"\d{5,10}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
+    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$", description="Cédula de identidad comienza con V o E, de venezolano o extranjero, JPGRO")
+    doc_identidad: str = Field(..., pattern=r"\d{5,30}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
     nu_telefono: str = Field(...,
                              pattern=r"^58(412|414|416|424|426)\d{7}$",
                              description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
