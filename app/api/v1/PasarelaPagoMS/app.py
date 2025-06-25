@@ -43,7 +43,6 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 )
 def registrar_pago(
     request: RegistroPagoBase,
-    client: httpx.AsyncClient = Depends(get_client),
     api_key: str = Security(api_key_verifier),
 ):
     """
@@ -176,22 +175,15 @@ def registrar_pago(
 
 
     if response.status_code != 200:
-
         logger.error(f"{response.text}")
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
 
         logger.error(f"{response.text}")
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
