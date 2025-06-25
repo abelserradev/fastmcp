@@ -2,8 +2,7 @@ import json
 from typing import Dict
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Security, status
-
+from fastapi import APIRouter, HTTPException, Security, status
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v1.PasarelaPagoMS.ModelAPI import (
     RegistroPagoBase,
@@ -11,8 +10,8 @@ from app.schemas.v1.PasarelaPagoMS.ModelAPI import (
     TasaBCVBase,
     NotificacionPagoBase,
 )
-from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponsePagoBase, ResponseOTPMBU, ResponseTasaBCV
-from app.utils.v1.AsyncHttpx import get_client, fetch_url
+from app.schemas.v1.PasarelaPagoMS.ResponseModelAPI import ResponseTasaBCV
+
 from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP
 from app.utils.v1.constants import (
     url_registrar_pago,
@@ -24,7 +23,7 @@ from app.utils.v1.constants import (
     headers_notificacion_pago_ms,
 )
 from app.utils.v1.LoggerSingleton import logger
-from app.utils.v2.SyncHttpx import sync_fetch_url
+
 from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv, \
     payload_notificacion_pago
 from datetime import datetime
@@ -33,6 +32,9 @@ router = APIRouter(
 )
 
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
+
+
+
 
 
 @router.post(
