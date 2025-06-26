@@ -307,10 +307,7 @@ def otp_mbu(
 
     if response.status_code != 200:
         logger.error(f"{response.text}")
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        detail = f"{response.text}"
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
@@ -318,10 +315,8 @@ def otp_mbu(
 
     if resp["status"]["code"] != "EXITO":
 
-        try:
-            detail = f"{resp["status"]["description"]}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=detail)
@@ -417,14 +412,11 @@ def consulta_tasa_bcv(
     resp = response.json()
 
     if resp["status"]["code"] != "EXITO":
-        try:
-            detail = f"{resp["status"]["description"]}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=detail)
-
 
     return resp["tasa"][0]
 
@@ -531,13 +523,11 @@ def notificacion_pago(
         )
 
     if response.status_code != 200:
-
         logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
                             detail=f"{response.text}")
 
     if response.json()["status"]["code"] != "EXITO":
-
         logger.error(f"{response.text}")
         raise HTTPException(status_code=response.status_code,
                             detail=f"{response.text} ")
