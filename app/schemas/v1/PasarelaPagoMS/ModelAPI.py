@@ -385,7 +385,7 @@ class InstrumentoC2PBase(BaseModel):
     nu_telefono: str = Field(...,
                              pattern=r"^58(412|414|416|424|426)\d{7}$",
                              description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
-    cd_banco: str = Field(..., pattern=r"^(0102|0104|0105|0108|0114|0115|0116|0128|0134|0137|0138|0146|0156|0157|0163|0166|0168|0169|0171|0173|0174|0175|0177|0191)$")
+    cd_banco: str = Field(..., pattern=r"^(0102|0104|0105|0108|0114|0115|0116|0128|0134|0137|0138|0146|0151|0156|0157|0163|0166|0168|0169|0171|0172|0173|0174|0175|0177|0191)$")
     otp: str
 
 class InstrumentoTDCBase(BaseModel):
