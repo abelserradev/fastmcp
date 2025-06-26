@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from app.api.v1.Integration_SM.app import router as api_router_v1
 from app.middlewares.ConfigureMiddleware import configure_middleware
@@ -18,6 +20,28 @@ app = FastAPI(
 
 
 configure_middleware(app)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Este manejador se activa cada vez que una validación de Pydantic falla.
+    `exc` es la instancia de la excepción original `RequestValidationError`.
+    """
+    # Obtenemos los detalles del error en un formato legible
+    error_details = exc.errors()
+
+    # Loggeamos los detalles del error en el servidor. ¡Esto es lo que necesitas!
+    logger.error(f"Error de validación en la petición: {request.method} {request.url}")
+    logger.error(f"Payload recibido (cuerpo): {await request.body()}")
+    logger.error(f"Detalles del error de Pydantic: {error_details}")
+
+    # Podemos incluso modificar la respuesta que se envía al cliente si quisiéramos.
+    # Por ahora, simplemente replicaremos el comportamiento por defecto de FastAPI,
+    # que es devolver los detalles del error.
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": error_details},
+    )
 
 
 @app.get("/health", tags=["Health"])
