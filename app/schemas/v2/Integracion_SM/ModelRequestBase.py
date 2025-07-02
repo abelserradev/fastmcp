@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Union
 
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, Field
 
-from app.utils.v1.configs import SUMA_ASEGURADA
+from app.utils.v1.regular_expressions import expr_num_documento
 
 
 class TipoDocumento(Enum):
@@ -62,7 +62,7 @@ class FrecuenciaCuota(Enum):
 
 
 class DocumentoBase(BaseModel):
-    nu_documento: str = Field(..., pattern=r"^[VEP]-\d{5,30}$")
+    nu_documento: str = Field(..., pattern=expr_num_documento)
 
 
 class PolizaBase(BaseModel):

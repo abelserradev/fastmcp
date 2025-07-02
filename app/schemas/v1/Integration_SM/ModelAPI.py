@@ -4,6 +4,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, EmailStr, Field, validator, field_validator
 
+from app.utils.v1.regular_expressions import expr_num_documento
+
 
 class TipoDocumento(Enum):
     """
@@ -42,7 +44,7 @@ class ConsultarPersonaBase(BaseModel):
                        pattern where it starts with a character ('V', 'E', or 'P'), followed by a dash ('-'),
                        and then contains 5 to 30 digits.
     """
-    num_documento: str = Field(..., pattern=r"^[VEP]-\d{5,30}$")
+    num_documento: str = Field(..., pattern=expr_num_documento)
     # tipo_documento: TipoDocumento
 
 
@@ -56,7 +58,7 @@ class DocumentoBase(BaseModel):
                        and then contains 5 to 30 digits.
     """
     # tp_documento: TipoDocumento
-    nu_documento: str = Field(..., pattern=r"^[VEP]-\d{5,30}$")
+    nu_documento: str = Field(..., pattern=expr_num_documento)
 
 
 class ContactoBase(BaseModel):
