@@ -221,19 +221,15 @@ def crear_persona(
         )
 
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
@@ -432,19 +428,15 @@ async def emitir_poliza(
         )
 
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
@@ -531,19 +523,15 @@ async def consultar_poliza(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
@@ -640,19 +628,15 @@ async def incluir_anexo(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
@@ -739,20 +723,16 @@ async def consultar_recibos(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
 
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)

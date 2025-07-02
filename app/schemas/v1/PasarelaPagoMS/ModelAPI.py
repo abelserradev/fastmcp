@@ -5,6 +5,16 @@ import re
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from app.utils.v1.regular_expressions import (
+    expr_num_documento,
+    expr_tp_identidad,
+    expr_doc_identidad,
+    expr_nu_telefono,
+    expr_cd_banco,
+    expr_fe_vencimiento,
+    expr_fecha_regex,
+)
+
 
 class TipoDocumento(Enum):
     """
@@ -43,7 +53,7 @@ class ConsultarPersonaBase(BaseModel):
                        pattern where it starts with a character ('V', 'E', or 'P'), followed by a dash ('-'),
                        and then contains 5 to 30 digits.
     """
-    num_documento: str = Field(..., pattern=r"^[VEP]-\d{5,30}$")
+    num_documento: str = Field(..., pattern=expr_num_documento)
     # tipo_documento: TipoDocumento
 
 
@@ -57,7 +67,7 @@ class DocumentoBase(BaseModel):
                        and then contains 5 to 30 digits.
     """
     # tp_documento: TipoDocumento
-    nu_documento: str = Field(..., pattern=r"^[VEP]-\d{5,30}$")
+    nu_documento: str = Field(..., pattern=expr_num_documento)
 
 
 class ContactoBase(BaseModel):
@@ -380,22 +390,22 @@ class TipoInstrumentoPagoEnum(Enum):
 class InstrumentoC2PBase(BaseModel):
 
     #numero: int
-    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
-    doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
+    tp_identidad: str = Field(..., pattern=expr_tp_identidad)
+    doc_identidad: str = Field(..., pattern=expr_doc_identidad)
     nu_telefono: str = Field(...,
-                             pattern=r"^58(412|414|416|424|426)\d{7}$",
+                             pattern=expr_nu_telefono,
                              description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
-    cd_banco: str = Field(..., pattern=r"^(0102|0104|0105|0108|0114|0115|0116|0128|0134|0137|0138|0146|0151|0156|0157|0163|0166|0168|0169|0171|0172|0173|0174|0175|0177|0191)$")
+    cd_banco: str = Field(..., pattern=expr_cd_banco)
     otp: str
 
 class InstrumentoTDCBase(BaseModel):
 
     numero: int
-    fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
+    fe_vencimiento: str = Field(..., pattern=expr_fe_vencimiento)
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VE]$")
-    doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
+    tp_identidad: str = Field(..., pattern=expr_tp_identidad)
+    doc_identidad: str = Field(..., pattern=expr_doc_identidad)
 
 class TPCuentaEnum(Enum):
     CC = "CC"
@@ -404,11 +414,11 @@ class TPCuentaEnum(Enum):
 class InstrumentoTDDBase(BaseModel):
 
     numero: int
-    fe_vencimiento: str = Field(..., pattern=r"^(0[1-9]|1[0-2])-\d{4}$")
+    fe_vencimiento: str = Field(..., pattern=expr_fe_vencimiento)
     cd_verificacion: int
     nombre_tarjeta: str
-    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$")
-    doc_identidad: str = Field(..., pattern=r"\d{5,30}$")
+    tp_identidad: str = Field(..., pattern=expr_tp_identidad)
+    doc_identidad: str = Field(..., pattern=expr_doc_identidad)
     tp_cuenta: TPCuentaEnum
     otp: str
 
@@ -443,10 +453,10 @@ class InstrumentoC2PMnuEnum(Enum):
     TDD = "TDD"
 
 class InstrumentoModel(BaseModel):
-    tp_identidad: str = Field(..., pattern=r"^[VEJPGRO]$", description="Cédula de identidad comienza con V o E, de venezolano o extranjero, JPGRO")
-    doc_identidad: str = Field(..., pattern=r"\d{5,30}$", description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
+    tp_identidad: str = Field(..., pattern=expr_tp_identidad, description="Cédula de identidad comienza con V o E, de venezolano o extranjero, JPGRO")
+    doc_identidad: str = Field(..., pattern=expr_doc_identidad, description="Cédula puede ser entre 5 a 10 dígitos de longitud.")
     nu_telefono: str = Field(...,
-                             pattern=r"^58(412|414|416|424|426)\d{7}$",
+                             pattern=expr_nu_telefono,
                              description="Número de teléfono debe iniciar con 58 y contener un prefijo válido, seguido de 7 dígitos.")
 
 
@@ -458,7 +468,7 @@ class TasaBCVBase(BaseModel):
     fe_tasa: str
 
     # Definimos un patrón de regex para validar el formato dd/mm/yyyy
-    fecha_regex: ClassVar[re.Pattern] = re.compile(r'^\d{2}/\d{2}/\d{4}$')
+    fecha_regex: ClassVar[re.Pattern] = re.compile(expr_fecha_regex)
 
     @field_validator('fe_tasa')
     def validate_fe_tasa(cls, value):

@@ -9,8 +9,6 @@ from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
 from app.schemas.v3.Integracion_SM.ModelRequestBase import CrearPolizaBase
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
-#from app.schemas.v3.Integracion_SM.ModelResponseBase import CotizacionResponse
-#from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
 from app.utils.v1.constants import (
@@ -221,19 +219,14 @@ async def crear_cotizacion(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
 
     if response.json()["status"]["code"] != "EXITO":
-        try:
-            detail = f"{response.json()['status']['code']} {response.json()['status']['descripcion']}"
-        except KeyError:
-            detail = f"{response.text}"
+
+        detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
                             detail=detail)
