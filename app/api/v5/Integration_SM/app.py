@@ -21,7 +21,7 @@ from app.utils.v1.constants import (
     plan,
 )
 from app.utils.v1.LoggerSingleton import logger
-
+from app.utils.v2.SyncHttpx import sync_fetch_url
 
 from app.utils.v5.payload_templates import payload_cotizacion
 
