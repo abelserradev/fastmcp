@@ -91,3 +91,8 @@ headers_notificacion_pago_ms = {
     "Connection": "keep-alive",
     "Accept-Encoding": "gzip, deflate, br",
 }
+plan = {
+    "cd_dato": "710038",  # Valor Fijo
+    "nu_bien": "1",
+    "valor": "1"
+}
