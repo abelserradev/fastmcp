@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Union
+from typing import List, Optional, Union
 
 
 from pydantic import BaseModel, Field
@@ -37,7 +37,7 @@ class Sexo(Enum):
 
 
 class Parentesco(Enum):
-    CONYUGUE = "CONYUGUE"
+    CONYUGE = "CONYUGE"
     HIJO = "HIJO"
     PADRE = "PADRE"
     MADRE = "MADRE"
@@ -81,6 +81,16 @@ class PersonaPolizaBase(BaseModel):
     sexo: Sexo
 
 
+class BeneficiariosBase(BaseModel):
+    cd_parentesco: Parentesco
+    nu_documento: str = Field(..., pattern=expr_num_documento)
+    fe_nacimiento: str
+    nm_primer_nombre: str
+    cd_sexo: Sexo
+    nm_primer_apellido: str
+
+
+
 class CrearPolizaBase(BaseModel):
     """
     CrearPolizaBase is a Pydantic model used to create an insurance policy.
@@ -89,8 +99,15 @@ class CrearPolizaBase(BaseModel):
         persona (PersonaPolizaBase): The personal data associated with the policy.
         poliza (PolizaBase): The basic details of the insurance policy.
     """
-    persona: PersonaPolizaBase
+    contratante: PersonaPolizaBase
+    titular: PersonaPolizaBase
     poliza: PolizaBase
+    plan: Optional[int] = 1
+    tiene_conyuge: Optional[bool] = False
+    cantidad_hijos: Optional[int] = 0
+    tiene_padre: Optional[bool] = False
+    tiene_madre: Optional[bool] = False
+    beneficiarios: Optional[List[BeneficiariosBase]] = []
 
 
 class DatosPolizaBase(BaseModel):
@@ -100,11 +117,3 @@ class DatosPolizaBase(BaseModel):
     nu_certificado: int
     nu_endoso: int
 
-class SolicitudCuadroPolizaBase(BaseModel):
-    datos_poliza: DatosPolizaBase
-
-
-
-class ConsultarCotizacionBase(BaseModel):
-    nu_cotizacion: int
-    cd_entidad: int

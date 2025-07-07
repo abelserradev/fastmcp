@@ -1,29 +1,32 @@
 import json
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi import APIRouter, HTTPException, Security, status
 
 
 
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
-from app.schemas.v3.Integracion_SM.ModelRequestBase import CrearPolizaBase
-from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
-from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
+from app.schemas.v5.Integracion_SM.ModelRequestBase import CrearPolizaBase
+
+
+from app.utils.v1.configs import API_KEY_AUTH
 from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
     tipo_documento,
-    url_cotizar, PARENTESCO
+    url_cotizar,
+    PARENTESCO,
+    plan,
 )
 from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.SyncHttpx import sync_fetch_url
 
-
-from app.utils.v3.payload_templates import payload_cotizacion
+from app.utils.v5.payload_templates import payload_cotizacion
 
 router = APIRouter(
-    tags=["MS Integration Version 3"],
+    tags=["MS Integration Version 5"],
 )
 
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
@@ -35,17 +38,22 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
     status_code=status.HTTP_200_OK,
     summary="Crear cotizacion de persona en Seguros Mercantil",
 )
-async def crear_cotizacion(
+def crear_cotizacion(
         request: CrearPolizaBase,
-        client: httpx.AsyncClient = Depends(get_client),
+        #client: httpx.AsyncClient = Depends(get_client),
         api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump(exclude_unset=True)
-    logger.info(f"data: {data}")
+
+    # logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
+    # logger.info(f"Payload:{payload}")
+
     datos = payload.get("coll_datos").get("datos").copy()
     generales = payload.get("coll_generales").get("generales")
-
+    new_plan = plan.copy()
+    new_plan["valor"] = f"{data['plan']}"
+    datos.append(new_plan)
 
     num_hijos = int(data.get("cantidad_hijos",0))
     tiene_conyuge = data.get("tiene_conyuge", False)
@@ -108,17 +116,39 @@ async def crear_cotizacion(
             }
         )
 
-    nombre_titular = f"{data['persona']['nm_primer_nombre']} {data['persona']['nm_primer_apellido']}"
+    nombre_titular = f"{data['titular']['nm_primer_nombre']} {data['titular']['nm_primer_apellido']}"
 
-    nu_documento = (
-        data["persona"]["documento"]["nu_documento"][2:]
-        if data["persona"]["documento"]["nu_documento"][0] == "P"
-        else data["persona"]["documento"]["nu_documento"]
+
+    nu_documento_titular = (
+        data["titular"]["documento"]["nu_documento"][2:]
+        if data["titular"]["documento"]["nu_documento"][0] == "P"
+        else data["titular"]["documento"]["nu_documento"]
     )
-    tp_documento = tipo_documento[data["persona"]["documento"]["nu_documento"][0]]
+    tp_documento_titular = tipo_documento[data["titular"]["documento"]["nu_documento"][0]]
 
-    sexo_titular = data['persona']['sexo'].value
-    fecha_nacimiento_titular = data['persona']['fecha_nacimiento']
+    sexo_titular = data['titular']['sexo'].value
+    fecha_nacimiento_titular = data['titular']['fecha_nacimiento']
+
+    logger.info(nombre_titular)
+    logger.info(f"documento: {nu_documento_titular}")
+    logger.info(tp_documento_titular)
+    logger.info(sexo_titular)
+    logger.info(fecha_nacimiento_titular)
+
+    nombre_contratante = f"{data['contratante']['nm_primer_nombre']} {data['contratante']['nm_primer_apellido']}"
+
+    nu_documento_contratante = (
+        data["contratante"]["documento"]["nu_documento"][2:]
+        if data["contratante"]["documento"]["nu_documento"][0] == "P"
+        else data["contratante"]["documento"]["nu_documento"]
+    )
+    tp_documento_contratante = tipo_documento[data["contratante"]["documento"]["nu_documento"][0]]
+
+    sexo_contratante = data['contratante']['sexo'].value
+    fecha_nacimiento_contratante = data['contratante']['fecha_nacimiento']
+
+
+
     fe_desde = data['poliza']['fe_desde']
     fe_hasta = data['poliza']['fe_hasta']
     frecuencia = data['poliza']['frecuencia_cuota']
@@ -154,12 +184,12 @@ async def crear_cotizacion(
     general["fe_desde"] = fe_desde
     general["fe_hasta"] = fe_hasta
     general["ca_cuota"] = "1"
-    general["nu_documento_contratante"] = nu_documento
-    general["nu_documento"] = nu_documento
+    general["nu_documento_contratante"] = nu_documento_contratante
+    general["nu_documento"] = nu_documento_titular
     general["cd_frecuencia_cuota"] = frecuencia.value[0]
     general["nm_cliente"] = nombre_titular
-    general["tp_documento"] = tp_documento
-    general["tp_documento_contratante"] = tp_documento
+    general["tp_documento"] = tp_documento_titular
+    general["tp_documento_contratante"] = tp_documento_contratante
     grpasegs = []
 
     for index,beneficiario in enumerate(beneficiarios):
@@ -191,8 +221,10 @@ async def crear_cotizacion(
     payload["coll_generales"] = {"generales": [general]}
     payload["coll_grpaseg"] = {"grpaseg": grpasegs}
     try:
+        logger.info(f"URL-> {url_cotizar}")
         logger.info(f"Payload-> {json.dumps(payload)}")
-        response = await  fetch_url(
+        logger.info(f"headers-> {headers}")
+        response = sync_fetch_url(
             "POST",
             url_cotizar,
             headers,
@@ -219,6 +251,7 @@ async def crear_cotizacion(
 
     # verificar si el request fue exitoso
     if response.status_code != 200:
+
         detail = f"{response.text}"
         logger.error(detail)
         raise HTTPException(status_code=response.status_code,
