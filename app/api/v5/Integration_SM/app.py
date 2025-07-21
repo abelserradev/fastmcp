@@ -34,7 +34,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 @router.post(
     "/crear_cotizacion_global",
-    response_model=CotizacionResponse,
+    #response_model=CotizacionResponse,
     status_code=status.HTTP_200_OK,
     summary="Crear cotizacion de persona en Seguros Mercantil",
 )
@@ -45,14 +45,14 @@ def crear_cotizacion(
 ):
     data = request.model_dump(exclude_unset=True)
 
-    # logger.info(f"data: {data}")
+    logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
-    # logger.info(f"Payload:{payload}")
-
+    logger.info(f"Payload:{payload}")
     datos = payload.get("coll_datos").get("datos").copy()
     generales = payload.get("coll_generales").get("generales")
     new_plan = plan.copy()
-    new_plan["valor"] = f"{data['plan']}"
+    new_plan["valor"] = f"{data.get('plan', 1)}"
+
     datos.append(new_plan)
 
     num_hijos = int(data.get("cantidad_hijos",0))
