@@ -1,6 +1,6 @@
 
 services:
-  integration_sm_api:
+  integration_sm_api_feature_branch:
     build:
       context: .
       dockerfile: Dockerfile
