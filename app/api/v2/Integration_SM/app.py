@@ -18,6 +18,7 @@ from app.schemas.v2.Integracion_SM.ModelRequestBase import CrearPolizaBase, Soli
     ConsultarCotizacionBase
 from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse, CuadroPolizaResponse
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
+from app.utils.v1.messages_error import INTERNAL_ERROR, TIMEOUT_ERROR
 from app.utils.v2.SyncHttpx import get_sync_client, sync_fetch_url
 
 from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
@@ -132,13 +133,13 @@ async def crear_cotizacion(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
@@ -208,13 +209,13 @@ async def get_cuadro_poliza(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
 
     except httpx.HTTPError as e:
@@ -284,13 +285,13 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
@@ -367,7 +368,6 @@ async def consultar_cotizacion(request: ConsultarCotizacionBase, api_key: str = 
 
 @router.post(
     "/emitir_poliza",
-    response_model=EmisionResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Emitir poliza de persona en Seguros Mercantil",
 )
@@ -409,13 +409,13 @@ def emitir_poliza(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
