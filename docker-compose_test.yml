@@ -1,6 +1,6 @@
 
 services:
-  integration_sm_api:
+  integration_sm_api_develop:
     build:
       context: .
       dockerfile: Dockerfile
