@@ -2,9 +2,11 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union, ClassVar
 import re
+from fastapi import HTTPException,status
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, validator
 
+from app.utils.v1.messages_error import CD_RECIBO_ERROR, NU_POLIZA_ERROR
 from app.utils.v1.regular_expressions import (
     expr_num_documento,
     expr_tp_identidad,
@@ -438,11 +440,13 @@ class PagoBase(BaseModel):
 class ReciboPagoBase(BaseModel):
     cd_entidad: int
     cd_area: int
-    nu_poliza: int
+    nu_poliza: int = Field(..., gt=0 )
     nu_certificado: int
-    cd_recibo: int
+    cd_recibo: int = Field(..., gt=0 )
     nu_convenio_pago: int
     nu_cuota: int
+
+
 
 class RegistroPagoBase(BaseModel):
     recibo_poliza_pago: ReciboPagoBase
@@ -486,7 +490,20 @@ class PolizaReciboCuotaBase(BaseModel):
     nu_convenio_pago: str
     nu_cuota: Optional[str] = "1"
 
+    @field_validator("cd_recibo")
+    def cd_recibo_must_not_be_zero(cls, v):
 
+        if v == "0":
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=CD_RECIBO_ERROR)
+        return v
+
+    @field_validator("nu_poliza")
+    def nu_poliza_must_not_be_zero(cls, v):
+        if v == "0":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=NU_POLIZA_ERROR
+            )
+        return v
 
 
 class TipoPagoEnum(Enum):
