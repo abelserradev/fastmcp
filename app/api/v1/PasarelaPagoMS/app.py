@@ -466,7 +466,7 @@ def notificacion_pago(
         extracted from the "datos" key in the server's JSON response.
     """
     data = request.model_dump()
-    if int(data["poliza_recibo_cuota"]["cd_recibo"]) == 0:
+    if int(data["poliza_recibo_cuota"][0]["cd_recibo"]) == 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=CD_RECIBO_ERROR)
 
     tipo_pago = data.get("tipo_pago").value
