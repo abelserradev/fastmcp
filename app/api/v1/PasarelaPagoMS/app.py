@@ -467,7 +467,7 @@ def notificacion_pago(
     """
     data = request.model_dump()
     logger.info(f"Data: {data}")
-    if int(data["poliza_recibo_cuota"][0]["cd_recibo"]) == 0:
+    if data["poliza_recibo_cuota"][0]["cd_recibo"] == '0':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=CD_RECIBO_ERROR)
 
     tipo_pago = data.get("tipo_pago").value
