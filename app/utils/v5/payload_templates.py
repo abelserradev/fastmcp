@@ -122,7 +122,7 @@ payload_cotizacion = {
                 # Variable  código de plan 201 Mensual, 202 Trimestral, 203 Semestral, 204 Anual.
                 "fe_desde": "25/10/2024",  # , Variable Fecha desde póliza.
                 "cd_producto": "710100",  # Valor fijo
-                "cd_persona_med": "11626",  # Valor fijo
+                "cd_persona_med": "",  # Valor fijo 11626
                 "di_ip": "0.0.0.0",  # Valor fijo
                 "in_web_externa": "",  # Valor fijo
                 "nu_poliza_relacionada": "",  # Valor fijo

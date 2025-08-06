@@ -103,6 +103,7 @@ class CrearPolizaBase(BaseModel):
     titular: PersonaPolizaBase
     poliza: PolizaBase
     plan: Optional[int] = 1
+    cd_persona_med: Optional[int] = 11626
     tiene_conyuge: Optional[bool] = False
     cantidad_hijos: Optional[int] = 0
     tiene_padre: Optional[bool] = False
