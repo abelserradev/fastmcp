@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Security, status
 
 
 from app.middlewares.verify_api_key import APIKeyVerifier
-from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
+
 
 from app.schemas.v5.Integracion_SM.ModelRequestBase import CrearPolizaBase
 
@@ -18,7 +18,7 @@ from app.utils.v1.constants import (
     tipo_documento,
     url_cotizar,
     PARENTESCO,
-    plan,
+    plan, CD_PERSONA_MED,
 )
 from app.utils.v1.LoggerSingleton import logger
 from app.utils.v2.SyncHttpx import sync_fetch_url
@@ -34,7 +34,6 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 @router.post(
     "/crear_cotizacion_global",
-    #response_model=CotizacionResponse,
     status_code=status.HTTP_200_OK,
     summary="Crear cotizacion de persona en Seguros Mercantil",
 )
@@ -44,7 +43,7 @@ def crear_cotizacion(
         api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump(exclude_unset=True)
-
+    cd_persona_med = f"{data.get('cd_persona_med',CD_PERSONA_MED)}"
     logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
     logger.info(f"Payload:{payload}")
@@ -129,13 +128,6 @@ def crear_cotizacion(
     sexo_titular = data['titular']['sexo'].value
     fecha_nacimiento_titular = data['titular']['fecha_nacimiento']
 
-    logger.info(nombre_titular)
-    logger.info(f"documento: {nu_documento_titular}")
-    logger.info(tp_documento_titular)
-    logger.info(sexo_titular)
-    logger.info(fecha_nacimiento_titular)
-
-    nombre_contratante = f"{data['contratante']['nm_primer_nombre']} {data['contratante']['nm_primer_apellido']}"
 
     nu_documento_contratante = (
         data["contratante"]["documento"]["nu_documento"][2:]
@@ -143,10 +135,6 @@ def crear_cotizacion(
         else data["contratante"]["documento"]["nu_documento"]
     )
     tp_documento_contratante = tipo_documento[data["contratante"]["documento"]["nu_documento"][0]]
-
-    sexo_contratante = data['contratante']['sexo'].value
-    fecha_nacimiento_contratante = data['contratante']['fecha_nacimiento']
-
 
 
     fe_desde = data['poliza']['fe_desde']
@@ -190,6 +178,7 @@ def crear_cotizacion(
     general["nm_cliente"] = nombre_titular
     general["tp_documento"] = tp_documento_titular
     general["tp_documento_contratante"] = tp_documento_contratante
+    general["cd_persona_med"] = cd_persona_med
     grpasegs = []
 
     for index,beneficiario in enumerate(beneficiarios):

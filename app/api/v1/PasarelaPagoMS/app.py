@@ -23,6 +23,13 @@ from app.utils.v1.constants import (
     headers_notificacion_pago_ms,
 )
 from app.utils.v1.LoggerSingleton import logger
+from app.utils.v1.messages_error import (
+    INTERNAL_ERROR,
+    TIMEOUT_ERROR,
+    TIPO_PAGO_ERROR,
+    CD_RECIBO_ERROR,
+    TIPO_INSTRUMENTO_ERROR,
+)
 
 from app.utils.v2.payload_templates import payload_pasarela_pago, payload_pasarela_otp, payload_tasa_bcv, \
     payload_notificacion_pago
@@ -39,7 +46,6 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 
 @router.post(
     "/registrar_pago",
-    #response_model=ResponsePagoBase,
     status_code=status.HTTP_200_OK,
     summary="Registrar Pago Pasarela MS",
 )
@@ -70,6 +76,7 @@ def registrar_pago(
     data = request.model_dump()
     logger.info(f"Data: {data}")
 
+
     recibo_poliza_pago = data.get("recibo_poliza_pago")
     pago = data.get("pago")
 
@@ -81,7 +88,7 @@ def registrar_pago(
     match tipo_instrumento_pago:
         case "C2P":
             instrumento_c2p = instrumento_pago.get("instrumento_c2p")
-            # instrumento["numero"] = instrumento_c2p.get("numero")
+
             instrumento["tp_identidad"] = instrumento_c2p.get("tp_identidad")
             instrumento["doc_identidad"] = instrumento_c2p.get("doc_identidad")
             instrumento["nu_telefono"] = instrumento_c2p.get("nu_telefono")
@@ -138,7 +145,7 @@ def registrar_pago(
             if "instrumento_c2p" in payload_pasarela_pago["datos"].keys():
                 del payload_pasarela_pago["datos"]["instrumento_c2p"]
         case _:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de instrumento no es C2P,TDC o TDD")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=TIPO_INSTRUMENTO_ERROR)
 
     payload_pasarela_pago["datos"][tipo_instrumento] = instrumento
 
@@ -159,13 +166,13 @@ def registrar_pago(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
@@ -201,7 +208,7 @@ def registrar_pago(
 
 @router.post(
     "/otp_mbu",
-    # response_model=ResponseOTPMBU,
+
     status_code=status.HTTP_200_OK,
     summary="Generar OTP Banco Mercantil",
 )
@@ -258,7 +265,7 @@ def otp_mbu(
 
                 del payload["datos"]["instrumento_c2p"]
         case _:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de instrumento no es C2P o TDD")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=TIPO_INSTRUMENTO_ERROR)
 
 
     logger.info(f"Payload: {json.dumps(payload)}")
@@ -289,13 +296,13 @@ def otp_mbu(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
@@ -385,13 +392,13 @@ def consulta_tasa_bcv(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")
@@ -424,7 +431,7 @@ def consulta_tasa_bcv(
 
 @router.post(
     "/notificacion",
-    #response_model=ResponseOTPMBU,
+
     status_code=status.HTTP_200_OK,
     summary="Registrar Notificacion Pago a MS",
 )
@@ -458,6 +465,9 @@ def notificacion_pago(
         extracted from the "datos" key in the server's JSON response.
     """
     data = request.model_dump()
+    logger.info(f"Data: {data}")
+
+
     tipo_pago = data.get("tipo_pago").value
 
     payload = payload_notificacion_pago.copy()
@@ -490,7 +500,7 @@ def notificacion_pago(
             except KeyError:
                 ...
         case _:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=f"Tipo de pago tiene que ser USD o BS")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=TIPO_PAGO_ERROR)
 
     try:
         logger.info(json.dumps(payload))
@@ -507,13 +517,13 @@ def notificacion_pago(
         logger.error(f"Error en la solicitud: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
+            detail=INTERNAL_ERROR,
         )
     except httpx.ReadTimeout as e:
         logger.error(f"Tiempo de espera excedido: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Tiempo de espera excedido",
+            detail=TIMEOUT_ERROR,
         )
     except httpx.HTTPError as e:
         logger.error(f"{e}")

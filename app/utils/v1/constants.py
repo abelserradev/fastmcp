@@ -96,3 +96,5 @@ plan = {
     "nu_bien": "1",
     "valor": "1"
 }
+
+CD_PERSONA_MED = 11626
