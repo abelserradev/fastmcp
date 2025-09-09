@@ -490,3 +490,8 @@ aws/
 .env
 .junie/guidelines.md
 .pre-commit-config.yaml
+.env.develop
+.env.feature_branch
+.env.staging
+logs/
+

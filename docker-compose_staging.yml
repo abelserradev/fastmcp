@@ -13,6 +13,8 @@ services:
       - "9050:9000"
     networks:
       - integration_sm_api_staging
+    volumes:
+      - './logs:/app/logs'
     restart: always
 
 

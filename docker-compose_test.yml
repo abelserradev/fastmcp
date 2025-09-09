@@ -13,6 +13,9 @@ services:
       - "9000:9000"
     networks:
       - integration_sm_api
+    volumes:
+      - './logs:/app/logs'
+
     restart: always
 
 
