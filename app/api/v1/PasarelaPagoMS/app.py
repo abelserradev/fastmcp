@@ -425,6 +425,7 @@ def consulta_tasa_bcv(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=detail)
 
+    logger.info(f"Response: {resp['tasa'][0]}")
     return resp["tasa"][0]
 
 
