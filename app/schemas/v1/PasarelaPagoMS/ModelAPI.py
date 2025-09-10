@@ -449,7 +449,7 @@ class ReciboPagoBase(BaseModel):
 
 
 class RegistroPagoBase(BaseModel):
-    recibo_poliza_pago: ReciboPagoBase
+    recibo_poliza_pago: List[ReciboPagoBase]
     pago: PagoBase
 
 class InstrumentoC2PMnuEnum(Enum):
