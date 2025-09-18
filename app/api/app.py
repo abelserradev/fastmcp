@@ -9,7 +9,7 @@ from app.api.v3.Integration_SM.app import router as api_router_v3
 from app.api.v4.Integration_SM.app import router as api_router_v4
 from app.api.v5.Integration_SM.app import router as api_router_v5
 from app.api.v1.PasarelaPagoMS.app import router as api_router_pasarela_ms_v1
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 
 app = FastAPI(
     title="Asistensi Integración Seguros Mercantil",  # The title of the API

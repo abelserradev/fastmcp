@@ -17,7 +17,7 @@ from app.utils.v1.constants import (
     tipo_documento,
     url_cotizar, PARENTESCO
 )
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 
 
 from app.utils.v3.payload_templates import payload_cotizacion

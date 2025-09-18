@@ -22,7 +22,7 @@ from app.utils.v1.constants import (
     url_notificacion_pago,
     headers_notificacion_pago_ms,
 )
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 from app.utils.v1.messages_error import (
     INTERNAL_ERROR,
     TIMEOUT_ERROR,

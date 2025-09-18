@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     MOCKUP: bool
     SM_ENDPOINT_NOTIFICACION_PAGO: str
     SM_NOTIFICACION_PAGO_KEY: str
+    MONGO_URI: str
 
 
     # Load the settings from the .env file
@@ -64,5 +65,6 @@ SM_PRIMARY_SUSCRIPTION_KEY = settings.SM_PRIMARY_SUSCRIPTION_KEY
 SM_ENDPOINT_SUSCRIPCION = settings.SM_ENDPOINT_SUSCRIPCION
 SM_ENDPOINT_NOTIFICACION_PAGO = settings.SM_ENDPOINT_NOTIFICACION_PAGO
 SM_NOTIFICACION_PAGO_KEY = settings.SM_NOTIFICACION_PAGO_KEY
+MONGO_URI = settings.MONGO_URI
 # Log that the settings have been loaded
 logger.info("Settings loaded")
