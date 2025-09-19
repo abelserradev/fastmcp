@@ -9,6 +9,7 @@ from app.api.v3.Integration_SM.app import router as api_router_v3
 from app.api.v4.Integration_SM.app import router as api_router_v4
 from app.api.v5.Integration_SM.app import router as api_router_v5
 from app.api.v1.PasarelaPagoMS.app import router as api_router_pasarela_ms_v1
+from app.api.v2.PasarelaPagoMS.app import router as api_router_pasarela_ms_v2
 from app.utils.v2.LoggerSingletonDB import logger
 
 app = FastAPI(
@@ -62,5 +63,6 @@ app.include_router(api_router_v3, prefix="/api/v3/sm")
 app.include_router(api_router_v4, prefix="/api/v4/sm")
 app.include_router(api_router_v5, prefix="/api/v5/sm")
 app.include_router(api_router_pasarela_ms_v1,prefix="/api/v1/pasarela_pago_ms")
+app.include_router(api_router_pasarela_ms_v2,prefix="/api/v2/pasarela_pago_ms")
 
 logger.info("API started")

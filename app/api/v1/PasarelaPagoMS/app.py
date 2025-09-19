@@ -122,7 +122,7 @@ def registrar_pago(
     logger.info(f"Moneda: {moneda_pago}")
     logger.info(f"Tipo de instrumento de pago:{tipo_instrumento_pago}")
     logger.info(f"Instrumento de pago: {instrumento}")
-    payload_pasarela_pago["datos"]["poliza_recibo_cuota"] = recibo_poliza_pago
+    payload_pasarela_pago["datos"]["poliza_recibo_cuota"] = [recibo_poliza_pago]
     payload_pasarela_pago["datos"]["tipo_instrumento_pago"] = tipo_instrumento_pago
     payload_pasarela_pago["datos"]["moneda_pago"] = moneda_pago
     match tipo_instrumento_pago:
