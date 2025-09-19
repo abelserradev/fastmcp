@@ -31,7 +31,7 @@ from app.utils.v1.constants import (
     url_cuadro_poliza,
     url_consultar_cotizacion, url_emitir_poliza
 )
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 from app.utils.v1.payload_templates import payload_emitir_poliza
 from app.utils.v2.mockup_response_cotizacion import cotizacion
 

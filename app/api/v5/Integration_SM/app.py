@@ -20,7 +20,7 @@ from app.utils.v1.constants import (
     PARENTESCO,
     plan, CD_PERSONA_MED,
 )
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 from app.utils.v2.SyncHttpx import sync_fetch_url
 
 from app.utils.v5.payload_templates import payload_cotizacion
@@ -44,9 +44,9 @@ def crear_cotizacion(
 ):
     data = request.model_dump(exclude_unset=True)
     cd_persona_med = f"{data.get('cd_persona_med',CD_PERSONA_MED)}"
-    logger.info(f"data: {data}")
+    # logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
-    logger.info(f"Payload:{payload}")
+    # logger.info(f"Payload:{payload}")
     datos = payload.get("coll_datos").get("datos").copy()
     generales = payload.get("coll_generales").get("generales")
     new_plan = plan.copy()
@@ -160,7 +160,7 @@ def crear_cotizacion(
             }
         ]
     )
-    logger.info(f"Datos: {json.dumps(datos)}")
+    # logger.info(f"Datos: {json.dumps(datos)}")
     bien = {
         "in_seleccion": "1",
         "nu_bien": "1",
@@ -204,15 +204,15 @@ def crear_cotizacion(
     payload.pop("coll_datos")
     payload.pop("coll_generales")
     payload.pop("coll_grpaseg")
-    logger.info(f"Payload to requests: {payload}")
+    # logger.info(f"Payload to requests: {payload}")
     payload["coll_datos"] = {"datos": datos}
     payload["coll_bienes"] = {"bienes": [bien]}
     payload["coll_generales"] = {"generales": [general]}
     payload["coll_grpaseg"] = {"grpaseg": grpasegs}
     try:
-        logger.info(f"URL-> {url_cotizar}")
+        # logger.info(f"URL-> {url_cotizar}")
         logger.info(f"Payload-> {json.dumps(payload)}")
-        logger.info(f"headers-> {headers}")
+        # logger.info(f"headers-> {headers}")
         response = sync_fetch_url(
             "POST",
             url_cotizar,

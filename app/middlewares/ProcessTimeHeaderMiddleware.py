@@ -3,8 +3,7 @@ import time
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.utils.v1.LoggerSingleton import logger
-
+from app.utils.v2.LoggerSingletonDB import logger
 
 class ProcessTimeHeaderMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
