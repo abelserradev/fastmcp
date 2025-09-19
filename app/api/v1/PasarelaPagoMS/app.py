@@ -152,8 +152,8 @@ def registrar_pago(
 
 
     try:
-        logger.info(f"URL:{url_registrar_pago}")
-        logger.info(f"HEADER: {headers_pasarela_ms}")
+        # logger.info(f"URL:{url_registrar_pago}")
+        # logger.info(f"HEADER: {headers_pasarela_ms}")
         logger.info(f"Payload: {json.dumps(payload_pasarela_pago)}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
@@ -281,8 +281,8 @@ def otp_mbu(
         return datos
 
     try:
-        logger.info(f"URL: {url_otp_mbu}")
-        logger.info(f"Headers: {headers_pasarela_ms}")
+        # logger.info(f"URL: {url_otp_mbu}")
+        # logger.info(f"Headers: {headers_pasarela_ms}")
         logger.info(f"Payload: {json.dumps(payload)}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
@@ -376,8 +376,8 @@ def consulta_tasa_bcv(
 
     payload["tasa"]["fe_tasa"] = data["fe_tasa"]
 
-    logger.info(f"Header:{headers_suscripcion_ms}")
-    logger.info(f"URL: {url_suscripcion_tasa_bcv}")
+    # logger.info(f"Header:{headers_suscripcion_ms}")
+    # logger.info(f"URL: {url_suscripcion_tasa_bcv}")
     logger.info(f"Payload: {payload}")
 
     try:
@@ -504,9 +504,9 @@ def notificacion_pago(
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=TIPO_PAGO_ERROR)
 
     try:
-        logger.info(json.dumps(payload))
-        logger.info(f"URL:{url_notificacion_pago}")
-        logger.info(f"HEADER: {headers_notificacion_pago_ms}")
+        logger.info(f"Payload: {json.dumps(payload)}")
+        # logger.info(f"URL:{url_notificacion_pago}")
+        # logger.info(f"HEADER: {headers_notificacion_pago_ms}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(
             url_notificacion_pago,

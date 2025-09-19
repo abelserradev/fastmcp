@@ -185,7 +185,7 @@ async def crear_cotizacion(
     payload.pop("coll_datos")
     payload.pop("coll_generales")
     payload.pop("coll_grpaseg")
-    logger.info(f"Payload to requests: {payload}")
+    # logger.info(f"Payload to requests: {payload}")
     payload["coll_datos"] = {"datos": datos}
     payload["coll_bienes"] = {"bienes": [bien]}
     payload["coll_generales"] = {"generales": [general]}

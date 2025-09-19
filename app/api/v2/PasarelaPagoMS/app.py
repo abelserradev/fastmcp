@@ -22,7 +22,7 @@ from app.utils.v1.messages_error import (
 from app.utils.v2.payload_templates import payload_pasarela_pago
 
 router = APIRouter(
-    tags=["Pasarela Pago MS Version 1"],
+    tags=["Pasarela Pago MS Version 2"],
 )
 
 api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
@@ -34,7 +34,7 @@ api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
 @router.post(
     "/registrar_pago",
     status_code=status.HTTP_200_OK,
-    summary="Registrar Pago Pasarela MS",
+    summary="Registrar Pago Pasarela MS v2",
 )
 def registrar_pago(
     request: RegistroPagoBase,
@@ -105,10 +105,10 @@ def registrar_pago(
                         detail=f"Error tipo de instrumento de pago: {tipo_instrumento_pago}",
                     )
 
-    logger.info(f"Recibo poliza pago:{recibo_poliza_pago}")
-    logger.info(f"Moneda: {moneda_pago}")
-    logger.info(f"Tipo de instrumento de pago:{tipo_instrumento_pago}")
-    logger.info(f"Instrumento de pago: {instrumento}")
+    # logger.info(f"Recibo poliza pago:{recibo_poliza_pago}")
+    # logger.info(f"Moneda: {moneda_pago}")
+    # logger.info(f"Tipo de instrumento de pago:{tipo_instrumento_pago}")
+    # logger.info(f"Instrumento de pago: {instrumento}")
     payload_pasarela_pago["datos"]["poliza_recibo_cuota"] = recibo_poliza_pago
     payload_pasarela_pago["datos"]["tipo_instrumento_pago"] = tipo_instrumento_pago
     payload_pasarela_pago["datos"]["moneda_pago"] = moneda_pago
@@ -139,8 +139,8 @@ def registrar_pago(
 
 
     try:
-        logger.info(f"URL:{url_registrar_pago}")
-        logger.info(f"HEADER: {headers_pasarela_ms}")
+        # logger.info(f"URL:{url_registrar_pago}")
+        # logger.info(f"HEADER: {headers_pasarela_ms}")
         logger.info(f"Payload: {json.dumps(payload_pasarela_pago)}")
         http_client = httpx.Client(verify=False)
         response = http_client.post(

@@ -125,11 +125,11 @@ def crear_cotizacion(
     sexo_titular = data['titular']['sexo'].value
     fecha_nacimiento_titular = data['titular']['fecha_nacimiento']
 
-    logger.info(nombre_titular)
-    logger.info(f"documento: {nu_documento_titular}")
-    logger.info(tp_documento_titular)
-    logger.info(sexo_titular)
-    logger.info(fecha_nacimiento_titular)
+    # logger.info(nombre_titular)
+    # logger.info(f"documento: {nu_documento_titular}")
+    # logger.info(tp_documento_titular)
+    # logger.info(sexo_titular)
+    # logger.info(fecha_nacimiento_titular)
 
     nombre_contratante = f"{data['contratante']['nm_primer_nombre']} {data['contratante']['nm_primer_apellido']}"
 
@@ -211,15 +211,15 @@ def crear_cotizacion(
     payload.pop("coll_datos")
     payload.pop("coll_generales")
     payload.pop("coll_grpaseg")
-    logger.info(f"Payload to requests: {payload}")
+    # logger.info(f"Payload to requests: {payload}")
     payload["coll_datos"] = {"datos": datos}
     payload["coll_bienes"] = {"bienes": [bien]}
     payload["coll_generales"] = {"generales": [general]}
     payload["coll_grpaseg"] = {"grpaseg": grpasegs}
     try:
-        logger.info(f"URL-> {url_cotizar}")
+        # logger.info(f"URL-> {url_cotizar}")
         logger.info(f"Payload-> {json.dumps(payload)}")
-        logger.info(f"headers-> {headers}")
+        # logger.info(f"headers-> {headers}")
         response = sync_fetch_url(
             "POST",
             url_cotizar,
