@@ -2,27 +2,19 @@ import sys
 import os
 from datetime import datetime
 from loguru import logger
+from app.utils.v1.MongoDBHandler import setup_mongodb_handler
 
-class LoggerSingleton:
+
+class LoggerSingletonDB:
     _instance = None
 
-    def __new__(cls, app_name="IntegracionMS"):
+    def __new__(cls,app_name="IntegracionMS"):
         if cls._instance is None:
-            # Remove any existing handlers
             logger.remove()
-
-            # Create logs directory if it doesn't exist
             logs_dir = "logs"
             if not os.path.exists(logs_dir):
                 os.makedirs(logs_dir)
 
-            # Generate log filename with date
-            log_filename = os.path.join(
-                logs_dir,
-                f"{datetime.now().strftime('%Y-%m-%d')}.log"
-            )
-
-            # Add handler for console output (real-time logs)
             logger.add(
                 sys.stdout,
                 colorize=True,
@@ -32,7 +24,11 @@ class LoggerSingleton:
                        "<level>{message}</level>",
             )
 
-            # Add handler for file output
+            # --- Handler para archivos (con rotación diaria) ---
+            log_filename = os.path.join(
+                logs_dir,
+                f"{datetime.now().strftime('%Y-%m-%d')}.log"
+            )
             logger.add(
                 log_filename,
                 rotation="12:00",  # Create new file at midnight
@@ -42,10 +38,15 @@ class LoggerSingleton:
                        "{level} | "
                        "{message}",
             )
-
+            mongodb_handler = setup_mongodb_handler()
+            logger.add(
+                mongodb_handler,
+                level="INFO",  # Define el nivel mínimo de logs para MongoDB
+                serialize=True,  # Esta es la clave para enviar el log completo como JSON
+            )
             cls._instance = logger
 
         return cls._instance
 
-# Create a logger instance
-logger = LoggerSingleton(app_name="IntegracionMS")  # noqa: F811
+logger = LoggerSingletonDB(app_name="IntegracionMS")
+

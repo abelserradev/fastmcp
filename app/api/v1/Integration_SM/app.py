@@ -22,7 +22,7 @@ from app.utils.v1.constants import (frecuencia_cuota, headers, tipo_documento,
                                     url_crear_persona, url_crear_cotizacion,
                                     url_emitir_poliza,
                                     url_inclusion_anexos_poliza)
-from app.utils.v1.LoggerSingleton import logger
+from app.utils.v2.LoggerSingletonDB import logger
 from app.utils.v1.payload_templates import (payload_consultar_persona,
                                             payload_consultar_poliza,
                                             payload_cotizacion,
