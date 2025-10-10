@@ -44,7 +44,7 @@ def crear_cotizacion(
 ):
     data = request.model_dump(exclude_unset=True)
     temporal_field = data.get('cd_persona_med')
-    cd_persona_med = f"{CD_PERSONA_MED}" if temporal_field == "None" else temporal_field
+    cd_persona_med = f"{CD_PERSONA_MED}" if temporal_field == "None" else f"{temporal_field}"
     #cd_persona_med = f"{data.get('cd_persona_med',CD_PERSONA_MED)}"
     # logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
