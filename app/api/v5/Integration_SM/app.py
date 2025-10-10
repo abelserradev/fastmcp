@@ -43,7 +43,9 @@ def crear_cotizacion(
         api_key: str = Security(api_key_verifier),
 ):
     data = request.model_dump(exclude_unset=True)
-    cd_persona_med = f"{data.get('cd_persona_med',CD_PERSONA_MED)}"
+    temporal_field = data.get('cd_persona_med')
+    cd_persona_med = f"{CD_PERSONA_MED}" if temporal_field == "None" else f"{temporal_field}"
+    #cd_persona_med = f"{data.get('cd_persona_med',CD_PERSONA_MED)}"
     # logger.info(f"data: {data}")
     payload = payload_cotizacion.copy()
     # logger.info(f"Payload:{payload}")
