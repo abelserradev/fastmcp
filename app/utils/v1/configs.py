@@ -77,6 +77,30 @@ def get_mcp_api_token() -> str:
     return settings.API_TOKEN_MCP
 
 
+def get_mcp_local_token() -> str:
+    """
+    Obtiene el token local para autenticación del servidor MCP.
+    
+    Returns:
+        str: El token local configurado en MCP_LOCAL_TOKEN
+        
+    Raises:
+        MCPErrorAuth: Si el token no está configurado
+    """
+    from app.mcp.exceptions import MCPErrorAuth
+    settings = get_settings()
+    
+    # MCP_LOCAL_TOKEN no está en Settings, así que lo obtenemos directamente del entorno
+    mcp_local_token = os.environ.get("MCP_LOCAL_TOKEN")
+    
+    if not mcp_local_token:
+        raise MCPErrorAuth(
+            "MCP_LOCAL_TOKEN no está configurado. "
+            "Por favor, configure MCP_LOCAL_TOKEN como variable de entorno."
+        )
+    return mcp_local_token
+
+
 # Assign the settings to variables (solo si no estamos en modo MCP o si están definidas)
 if not IS_MCP_MODE:
     API_KEY_AUTH = settings.API_KEY_AUTH or ""
