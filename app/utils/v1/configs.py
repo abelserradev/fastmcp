@@ -38,10 +38,9 @@ class Settings(BaseSettings):
     BACKEND_BASE_URL: str | None = None
     API_TOKEN_MCP: str | None = None
 
-
     # Load the settings from the .env file
     model_config = SettingsConfigDict(
-        env_file=str(ENV_FILE),
+        env_file=str(ENV_FILE) if ENV_FILE.exists() else None,
         env_file_encoding="utf-8",
         extra="ignore"
     )
@@ -74,27 +73,30 @@ def get_mcp_api_token() -> str:
 
 
 # Assign the settings to variables
-API_KEY_AUTH = settings.API_KEY_AUTH
-SM_PRIMARY_KEY = settings.SM_PRIMARY_KEY
-SM_SECONDARY_KEY = settings.SM_SECONDARY_KEY
-SM_ENDPOINT = settings.SM_ENDPOINT
-USER = settings.USER
-APPLICATION = settings.APPLICATION
-SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
-ENV = settings.ENV
-ALLOWED_HOST = settings.ALLOWED_HOST
-SUMA_ASEGURADA = settings.SUMA_ASEGURADA
-SM_PRIMARY_PASARELA_KEY = settings.SM_PRIMARY_PASARELA_KEY
-SM_ENDPOINT_PASARELA_MS = settings.SM_ENDPOINT_PASARELA_MS
-MID = settings.MID
-MOCKUP = settings.MOCKUP
-SM_PRIMARY_SUSCRIPTION_KEY = settings.SM_PRIMARY_SUSCRIPTION_KEY
-SM_ENDPOINT_SUSCRIPCION = settings.SM_ENDPOINT_SUSCRIPCION
-SM_ENDPOINT_NOTIFICACION_PAGO = settings.SM_ENDPOINT_NOTIFICACION_PAGO
-SM_NOTIFICACION_PAGO_KEY = settings.SM_NOTIFICACION_PAGO_KEY
-MONGO_URI = settings.MONGO_URI
-URL_ANULAR_POLIZA = settings.URL_ANULAR_POLIZA
-API_KEY_ANULAR_POLIZA = settings.API_KEY_ANULAR_POLIZA
+if not IS_MCP_MODE:
+    API_KEY_AUTH = settings.API_KEY_AUTH
+    SM_PRIMARY_KEY = settings.SM_PRIMARY_KEY
+    SM_SECONDARY_KEY = settings.SM_SECONDARY_KEY
+    SM_ENDPOINT = settings.SM_ENDPOINT
+    USER = settings.USER
+    APPLICATION = settings.APPLICATION
+    SUBSCRIPTION_KEY = settings.SUBSCRIPTION_KEY
+    ENV = settings.ENV
+    ALLOWED_HOST = settings.ALLOWED_HOST
+    SUMA_ASEGURADA = settings.SUMA_ASEGURADA
+    SM_PRIMARY_PASARELA_KEY = settings.SM_PRIMARY_PASARELA_KEY
+    SM_ENDPOINT_PASARELA_MS = settings.SM_ENDPOINT_PASARELA_MS
+    MID = settings.MID
+    MOCKUP = settings.MOCKUP
+    SM_PRIMARY_SUSCRIPTION_KEY = settings.SM_PRIMARY_SUSCRIPTION_KEY
+    SM_ENDPOINT_SUSCRIPCION = settings.SM_ENDPOINT_SUSCRIPCION
+    SM_ENDPOINT_NOTIFICACION_PAGO = settings.SM_ENDPOINT_NOTIFICACION_PAGO
+    SM_NOTIFICACION_PAGO_KEY = settings.SM_NOTIFICACION_PAGO_KEY
+    MONGO_URI = settings.MONGO_URI
+    URL_ANULAR_POLIZA = settings.URL_ANULAR_POLIZA
+    API_KEY_ANULAR_POLIZA = settings.API_KEY_ANULAR_POLIZA
+else:
+    API_KEY_AUTH = settings.API_TOKEN_MCP or ""
 
 
 def get_valid_api_keys() -> list[str]:
