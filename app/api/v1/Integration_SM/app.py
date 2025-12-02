@@ -9,19 +9,30 @@ from app.schemas.v1.Integration_SM.ModelAPI import (ConsultarPersonaBase,
                                                     CrearPersonaBase,
                                                     CrearPolizaBase,
                                                     EmitirPolizaBase,
-                                                    InclusionAnexosPolizaBase)
+                                                    InclusionAnexosPolizaBase, RequestAnularPolizaBase)
 from app.schemas.v1.Integration_SM.ResponseModelAPI import (AnexosConsultaResponse,
                                                             CotizacionResponse,
                                                             CreadaPersonaResponse,
                                                             EmisionResponse)
 from app.middlewares.verify_api_key import APIKeyVerifier
 from app.utils.v1.AsyncHttpx import get_client, fetch_url
-from app.utils.v1.configs import API_KEY_AUTH
-from app.utils.v1.constants import (frecuencia_cuota, headers, tipo_documento,
-                                    url_consult_persona, url_consultar_poliza,
-                                    url_crear_persona, url_crear_cotizacion,
-                                    url_emitir_poliza,
-                                    url_inclusion_anexos_poliza)
+from app.utils.v1.ExternalApis import request_anular_poliza
+from app.utils.v1.configs import API_KEY_AUTH, get_valid_api_keys
+from app.utils.v1.constants import (
+    frecuencia_cuota,
+    headers,
+    tipo_documento,
+    url_consult_persona,
+    url_consultar_poliza,
+    url_crear_persona,
+    url_crear_cotizacion,
+    url_emitir_poliza,
+    url_inclusion_anexos_poliza,
+    url_anular_poliza,
+    headers_anular_poliza,
+    cdPersonaContratante,
+    indAnulacion,
+)
 from app.utils.v2.LoggerSingletonDB import logger
 from app.utils.v1.payload_templates import (payload_consultar_persona,
                                             payload_consultar_poliza,
@@ -35,7 +46,7 @@ router = APIRouter(
     tags=["MS Integration Version 1"],
 )
 
-api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
+api_key_verifier = APIKeyVerifier(get_valid_api_keys())
 
 
 @router.post(
@@ -742,4 +753,52 @@ async def consultar_recibos(
     polizas = response_json.get("polizas", [])
     return {"polizas": polizas}
 
+
+@router.post("/anular_poliza")
+def anular_poliza(requests: RequestAnularPolizaBase, api_key: str = Security(api_key_verifier)) -> dict:
+    data = requests.model_dump(exclude_unset=True)
+    payload = data.copy()
+    payload["cdPersonaContratante"] = cdPersonaContratante
+    payload["indAnulacion"] = indAnulacion
+    logger.info(f"{payload}")
+    logger.info(f"x-api-key: {headers_anular_poliza['x-api-key']}")
+    logger.info(f"headers: {headers_anular_poliza}")
+    logger.info(f"URL: {url_anular_poliza}")
+    try:
+        resp_poliza_anulada = request_anular_poliza(url_anular_poliza,payload,headers_anular_poliza)
+        status_code = resp_poliza_anulada.status_code
+        message = resp_poliza_anulada.message
+        description = resp_poliza_anulada.descripcion
+        code = resp_poliza_anulada.code
+        detail = f"{description},{message}"
+
+        if code == "FALLONEGOCIO":
+            logger.warning(f"Error: descipcion:{description}, message:{message}")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+        if code == "ERROR":
+            logger.error(f"Error: descipcion:{description}")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
+        if status_code == 500:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
+
+        return {"message": message}
+
+    except httpx.RequestError as e:
+        logger.error(f"Error en la solicitud: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )
+    except httpx.ReadTimeout as e:
+        logger.error(f"Tiempo de espera excedido: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="Tiempo de espera excedido",
+        )
+    except httpx.HTTPError as e:
+        logger.error(f"{e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{e}",
+        )
 

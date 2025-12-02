@@ -16,6 +16,7 @@ from app.utils.v1.constants import (
     url_notificacion_pago,
     url_suscripcion_tasa_bcv,
     url_cuadro_poliza,
+    url_anular_poliza,
 )
 
 
@@ -64,6 +65,7 @@ def main():
     logger.info(f"URL notificar pago: {url_notificacion_pago}")
     logger.info(f"URL consultar Tasa BCV: {url_suscripcion_tasa_bcv}")
     logger.info(f"URL cuadro de póliza: {url_cuadro_poliza}")
+    logger.info(f"URL anular póliza: {url_anular_poliza}")
 
     if ENV in ["production", "staging"]:
 

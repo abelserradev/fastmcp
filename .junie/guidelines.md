@@ -1,151 +1,104 @@
-# Integration Seguros Mercantil - Developer Guidelines
+### Integration Seguros Mercantil — Project‑specific developer notes
 
-This document provides essential information for developers working on the Integration Seguros Mercantil project.
+This file captures concrete, project‑specific practices verified against the current repository and the docs in `docs/`. Audience: advanced developers.
 
-## Build/Configuration Instructions
+Updated: 2025‑11‑18 13:48 local time
 
-### Local Development Setup
+#### Build / configuration
 
-1. **Environment Setup**:
-   - Python 3.12 is required
-   - The project uses `uv` for dependency management
+- Runtime: Python 3.12. Dependency manager: `uv` (see `pyproject.toml`, `uv.lock`). Entrypoint: `run.py` → `uvicorn app.api.app:app` (port 9000; reload enabled unless `ENV` is `production`/`staging`).
+- Central app: `app/api/app.py` wires routers for v1–v5 (`Integration_SM`) and v1–v2 (`PasarelaPagoMS`). It exposes `GET /health` and `GET /docs`.
+- Settings: `app/utils/v1/configs.py` loads from `.env` at import time. Provide `.env` before running or testing. For local work, copy one of the provided envs and adjust:
+  - `cp .env.develop .env` (or adapt from `.env.staging`). Keys include `API_KEY_AUTH`, `SM_*`, `MONGO_URI`, `ENV`, etc. See `Settings` class for full list.
 
-2. **Install Dependencies**:
-   ```bash
-   uv sync --frozen --no-cache
-   ```
+Local run
 
-3. **Environment Variables**:
-   - Copy `.env.local` to `.env` for local development
-   - For staging, use `.env.stage`
-   - For production, use `.env.prod`
+1. Install dependencies:
+   - `uv sync --frozen --no-cache`
+2. Prepare env vars:
+   - `cp .env.develop .env` and edit as needed.
+3. Start API:
+   - `python run.py`
+   - Verify: `curl http://localhost:9000/health` → `{"status":"ok"}`
 
-4. **Run the Application**:
-   ```bash
-   python run.py
-   ```
-   - The application will run on port 9000 by default
-   - In development mode, the application will reload automatically when code changes
+Docker
 
-### Docker Setup
+- Default: `docker compose up --build` (see `docker-compose.yml`).
+- Env specific:
+  - Dev/Test: `docker compose -f docker-compose_test.yml up --build`
+  - Staging: `docker compose -f docker-compose_staging.yml up --build`
+  - Prod: `docker compose -f docker-compose.yml up --build`
 
-1. **Build and Run with Docker Compose**:
-   ```bash
-   docker compose up --build
-   ```
+#### Testing
 
-2. **Environment-Specific Configurations**:
-   - For development: `docker compose -f docker-compose_test.yml up --build`
-   - For staging: `docker compose -f docker-compose_staging.yml up --build`
-   - For production: `docker compose -f docker-compose.yml up --build`
+What exists now
 
-## Testing Information
+- Tests live in `tests/`. A minimal smoke suite is present: `tests/test_api.py` covering `GET /health` and `GET /docs`.
+- Verified on 2025‑11‑18: `2 passed` with pytest 9.0.1 under Python 3.12.3.
 
-### Setting Up Testing Environment
+One‑time test setup
 
-1. **Install Testing Dependencies**:
-   ```bash
-   uv pip install pytest httpx
-   ```
+1. App deps: `uv sync --frozen --no-cache`
+2. Testing tools: `uv pip install pytest httpx`
+3. Ensure `.env` is present (see above). Settings are loaded at import time and logs are emitted.
 
-2. **Test Directory Structure**:
-   - Place test files in the `tests/` directory
-   - Name test files with the prefix `test_` (e.g., `test_api.py`)
-   - Name test functions with the prefix `test_` (e.g., `test_api_health()`)
+Run tests
 
-### Running Tests
+- All: `python -m pytest -v`
+- Specific file: `python -m pytest tests/test_api.py -v`
 
-1. **Run All Tests**:
-   ```bash
-   python -m pytest
-   ```
+Creating new tests
 
-2. **Run Specific Test File**:
-   ```bash
-   python -m pytest tests/test_api.py
-   ```
+- Place files under `tests/` named `test_*.py`. Use FastAPI’s `TestClient`:
 
-3. **Run with Verbosity**:
-   ```bash
-   python -m pytest -v
-   ```
+```python
+from fastapi.testclient import TestClient
+from app.api.app import app
 
-### Creating New Tests
+client = TestClient(app)
 
-1. **Example Test**:
-   ```python
-   import pytest
-   from fastapi.testclient import TestClient
-   from app.api.app import app
+def test_health_ok():
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "ok"}
+```
 
-   client = TestClient(app)
+- Authenticated example: include the API key header expected by middlewares/dependencies (adjust header name according to implementation):
 
-   def test_example():
-       response = client.get("/health")
-       assert response.status_code == 200
-       assert response.json() == {"status": "ok"}
-   ```
+```python
+from fastapi.testclient import TestClient
+from app.api.app import app
 
-2. **Testing API Endpoints**:
-   - Use the FastAPI TestClient to make requests to your API
-   - For endpoints requiring authentication, include the API key in the request headers
-   - Example:
-     ```python
-     def test_authenticated_endpoint():
-         headers = {"X-API-Key": "test_api_key"}
-         response = client.get("/protected-endpoint", headers=headers)
-         assert response.status_code == 200
-     ```
+client = TestClient(app)
 
-## Additional Development Information
+headers = {"X-API-Key": "test_api_key"}
+resp = client.get("/api/v1/sm/protected", headers=headers)
+assert resp.status_code in (200, 401, 403)
+```
 
-### Project Structure
+Notes and caveats (validated)
 
-- `app/api/`: Contains the API routes and endpoints
-  - Organized by version (v1, v2, v3, v4)
-  - Each version has its own modules (Integration_SM, PasarelaPagoMS)
-- `app/schemas/`: Contains Pydantic models for request/response validation
-- `app/middlewares/`: Contains middleware components
-- `app/utils/`: Contains utility functions and constants
+- Logging sinks are best‑effort to support CI and read‑only FS:
+  - `app/utils/v1/LoggerSingleton.py` and `app/utils/v2/LoggerSingletonDB.py` now fall back to console if `logs/` cannot be created/written, and will skip Mongo sink if it cannot be set up. This prevents test collection failures due to `PermissionError` on `logs/YYYY-MM-DD.log`.
+  - If you require file logs in CI, ensure `logs/` is writable or mount a volume. Otherwise, console logging is sufficient for tests.
+- Mongo sink: with no Mongo available, you may see warnings like “MongoDB logging disabled (setup failed)” or a teardown message about a closed client. They are non‑fatal.
 
-### Code Style and Conventions
+#### Additional development information
 
-1. **Docstrings**:
-   - Use docstrings for all functions, classes, and modules
-   - Include parameter descriptions and return types
-   - Example:
-     ```python
-     def function_name(param1, param2):
-         """
-         Brief description of the function.
-         
-         Args:
-             param1: Description of param1
-             param2: Description of param2
-             
-         Returns:
-             Description of the return value
-         """
-     ```
+- Architecture: see `docs/ARCHITECTURE.md` and `docs/ARCHITECTURE_C4_3_COMPONENTS.md` for C4 view and runtime wiring. `docs/REPORT.md` lists follow‑ups (tests for payload mappers/validators, regression checks for known hotfixes, linters/type checks in CI).
+- Code style: follow current docstring practice (module/class/function docstrings with Args/Returns), keep error handling explicit, and log contextual data (external status codes, request identifiers).
+- API versioning: do not mutate existing Pydantic models. Add new models under `app/schemas/v{N}` and route changes through new versioned routers.
+- Configuration boundaries: treat all `Settings` fields as required via `.env`. Never hardcode environment‑specific or secret values.
+- Running in Docker/CI: expose port 9000; pass `.env` via secrets/variables. If you experience file logging permission issues, rely on console logs.
 
-2. **Error Handling**:
-   - Use try/except blocks for error handling
-   - Log errors with appropriate level (error, warning, info)
-   - Raise HTTPException with appropriate status code and detail message
+#### CI/CD
 
-3. **Logging**:
-   - Use the logger from `app.utils.v1.LoggerSingleton`
-   - Log important events with appropriate level
+- Bitbucket Pipelines deploy by branch: `develop` → dev, `staging` → staging, `main` → prod. Incorporate unit tests and (optionally) ruff/black/mypy steps as pre‑deploy gates as recommended in `docs/REPORT.md`.
 
-### CI/CD Pipeline
+#### Quick checklist
 
-- The project uses Bitbucket Pipelines for CI/CD
-- Different branches deploy to different environments:
-  - `develop` branch deploys to the development environment
-  - `staging` branch deploys to the staging environment
-  - `main` branch deploys to the production environment
-
-### API Documentation
-
-- API documentation is available at `/docs` when the application is running
-- The documentation is generated automatically from the code
+- [ ] `uv sync --frozen --no-cache`
+- [ ] `.env` present (e.g., from `.env.develop`)
+- [ ] `python run.py` → `/health` returns 200
+- [ ] `uv pip install pytest httpx` and `python -m pytest -v` → smoke tests pass
+- [ ] For new features, add tests under `tests/` and avoid real external calls by mocking HTTP/Mongo

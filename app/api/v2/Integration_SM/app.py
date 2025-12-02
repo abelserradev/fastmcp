@@ -21,7 +21,7 @@ from app.utils.v1.AsyncHttpx import fetch_url, get_client
 from app.utils.v1.messages_error import INTERNAL_ERROR, TIMEOUT_ERROR
 from app.utils.v2.SyncHttpx import get_sync_client, sync_fetch_url
 
-from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
+from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA, get_valid_api_keys
 from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
@@ -41,7 +41,7 @@ router = APIRouter(
     tags=["MS Integration Version 2"],
 )
 
-api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
+api_key_verifier = APIKeyVerifier(get_valid_api_keys())
 
 
 @router.post(

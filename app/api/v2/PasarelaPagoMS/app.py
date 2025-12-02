@@ -7,7 +7,7 @@ from app.middlewares.verify_api_key import APIKeyVerifier
 from app.schemas.v2.PasarelaPagoMS.ModelAPI import RegistroPagoBase
 
 
-from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP
+from app.utils.v1.configs import API_KEY_AUTH, MID, MOCKUP, get_valid_api_keys
 from app.utils.v1.constants import (
     url_registrar_pago,
     headers_pasarela_ms
@@ -25,7 +25,7 @@ router = APIRouter(
     tags=["Pasarela Pago MS Version 2"],
 )
 
-api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
+api_key_verifier = APIKeyVerifier(get_valid_api_keys())
 
 
 

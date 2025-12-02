@@ -22,10 +22,66 @@ class MongoDBHandler:
         """Convert record to MongoDB-compatible format."""
         serialized = {}
 
-        for key, value in record.items():
-            serialized[key] = self._serialize_value(value)
+        if 'time' in record:
+            serialized['time'] = self._serialize_value(record['time'])
+
+        if 'level' in record:
+            level = record['level']
+            serialized['level'] = {
+                'name': level.name,
+                'no': level.no,
+            }
+            if hasattr(level, 'icon'):
+                serialized['level']['icon'] = level.icon
+
+        if 'message' in record:
+            serialized['message'] = str(record['message'])
+
+
+        if 'name' in record:
+            serialized['name'] = record['name']
+
+        if 'file' in record and record['file']:
+            file_obj = record['file']
+            serialized['file'] = {
+                'name': file_obj.name if hasattr(file_obj, 'name') else None,
+                'path': file_obj.path if hasattr(file_obj, 'path') else None,
+                }
+                
+        if 'module' in record:
+            serialized['module'] = record['module']
+
+        if 'function' in record:
+            serialized['function'] = record['function']
+
+        if 'line' in record:
+            serialized['line'] = record['line']
+
+
+        if 'process' in record and record['process']:
+            proc = record['process']
+            serialized['process'] = {'id': proc.id if hasattr(proc, 'id') else None,
+            'name': proc.name if hasattr(proc, 'name') else None}
+
+
+        if 'thread' in record and record['thread']:
+            thread = record['thread']
+            serialized['thread'] = {
+                'id': thread.id if hasattr(thread, 'id') else None,
+                'name': thread.name if hasattr(thread, 'name') else None,
+            }
+
+        if 'exception' in record and record['exception']:
+            serialized['exception'] = self._serialize_value(record['exception'])
+
+        if 'extra' in record and record['extra']:
+            serialized['extra'] = self._serialize_value(record['extra'])
+
+        if 'elapsed' in record:
+            serialized['elapsed'] = self._serialize_value(record['elapsed'])
 
         return serialized
+
 
     def _serialize_value(self, value):
         """Helper method to serialize individual values."""

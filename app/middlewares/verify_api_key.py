@@ -23,9 +23,15 @@ class APIKeyVerifier:
         Initializes a new instance of the APIKeyVerifier class.
 
         Args:
-            api_keys (list[str]): The list of valid API keys.
+            api_keys (str | list[str]): A string with a single API key or a list of valid API keys.
         """
-        self.api_keys = api_keys
+        # Normalizar a lista: si es string, convertir a lista; si ya es lista, usarla directamente
+        if isinstance(api_keys, str):
+            self.api_keys = [api_keys]
+        elif isinstance(api_keys, list):
+            self.api_keys = api_keys
+        else:
+            self.api_keys = list(api_keys) if api_keys else []
 
     def __call__(self, api_key_header: str = Security(api_key_header)) -> str:
         """

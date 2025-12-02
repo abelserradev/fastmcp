@@ -364,3 +364,9 @@ class ConsultarRecibosPolizaBase(BaseModel):
 
 class GetPolizasBase(BaseModel):
     polizas: List[ConsultarRecibosPolizaBase]
+
+class RequestAnularPolizaBase(BaseModel):
+    cdEntidad: int
+    cdArea: int
+    nuPoliza: int
+    nuCertificado: int

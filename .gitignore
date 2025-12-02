@@ -495,3 +495,15 @@ aws/
 .env.staging
 logs/
 
+# Dumps de base de datos
+dump_cuida_saludDB.gz
+dump.desarrollo_20251124b.db.gz
+
+# Archivos de configuración MCP (si están en el proyecto)
+mcp.json
+.cursor/mcp.json
+
+# Archivos de prueba con datos
+prueba.json
+payload.json
+peticion.json

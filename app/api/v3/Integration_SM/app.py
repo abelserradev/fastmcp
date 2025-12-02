@@ -10,7 +10,7 @@ from app.schemas.v2.Integracion_SM.ModelResponseBase import CotizacionResponse
 from app.schemas.v3.Integracion_SM.ModelRequestBase import CrearPolizaBase
 from app.utils.v1.AsyncHttpx import fetch_url, get_client
 
-from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA
+from app.utils.v1.configs import API_KEY_AUTH, SUMA_ASEGURADA, get_valid_api_keys
 from app.utils.v1.constants import (
     frecuencia_cuota,
     headers,
@@ -26,7 +26,7 @@ router = APIRouter(
     tags=["MS Integration Version 3"],
 )
 
-api_key_verifier = APIKeyVerifier(API_KEY_AUTH)
+api_key_verifier = APIKeyVerifier(get_valid_api_keys())
 
 
 @router.post(

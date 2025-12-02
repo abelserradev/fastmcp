@@ -8,6 +8,8 @@ from app.utils.v1.configs import (
     SM_ENDPOINT_SUSCRIPCION,
     SM_ENDPOINT_NOTIFICACION_PAGO,
     SM_NOTIFICACION_PAGO_KEY,
+    URL_ANULAR_POLIZA,
+    API_KEY_ANULAR_POLIZA,
 )
 
 tipo_documento = {"V": "VEN", "E": "VEN", "P": "OPPA"}
@@ -27,6 +29,7 @@ url_registrar_pago = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/register"
 url_otp_mbu = f"{SM_ENDPOINT_PASARELA_MS}/onlinepay/otp_mbu"
 url_notificacion_pago = f"{SM_ENDPOINT_NOTIFICACION_PAGO}/notify_external_payment"
 url_suscripcion_tasa_bcv = f"{SM_ENDPOINT_SUSCRIPCION}/consultartasascambio"
+url_anular_poliza = f"{URL_ANULAR_POLIZA}"
 if ENV in ["production"]:
     url_cuadro_poliza = f"{SM_ENDPOINT}/swrep/executeRep"
 else:
@@ -59,8 +62,8 @@ PARENTESCO = {
 NU_TOTAL_CUOTAS = {
     "MENSUAL": 12,
     "TRIMESTRAL": 4,
-    "SEMESTRAL": 2,
-    "ANUAL": 1
+    "SEMESTRAL": 2, # no utilizar esto para test
+    "ANUAL": 1 #no usar esto para test
 }
 
 headers_pasarela_ms = {
@@ -98,3 +101,15 @@ plan = {
 }
 
 CD_PERSONA_MED = 11626
+
+headers_anular_poliza = {
+    "x-api-key": f"{API_KEY_ANULAR_POLIZA}",
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Accept-Encoding": "gzip, deflate, br",
+}
+
+cdPersonaContratante = 792342
+indAnulacion = 1
